@@ -12,11 +12,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        findViewById<Button>(R.id.btn_score_match).setOnClickListener {
-            startActivity(Intent(this, ScoreActivity::class.java))
+        findViewById<android.view.View>(R.id.card_new_game).setOnClickListener {
+            // Navigate to Match Setup instead of direct score
+            startActivity(Intent(this, com.sbuddy.app.ui.scoring.MatchSetupActivity::class.java))
         }
 
-        findViewById<Button>(R.id.btn_tournament).setOnClickListener {
+        findViewById<android.view.View>(R.id.card_history).setOnClickListener {
+            startActivity(Intent(this, com.sbuddy.app.ui.history.MatchHistoryActivity::class.java))
+        }
+
+        findViewById<android.view.View>(R.id.card_tournaments).setOnClickListener {
             startActivity(Intent(this, TournamentActivity::class.java))
         }
     }
