@@ -5,11 +5,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
-import android.widget.CheckBox
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.RadioButton
-import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -19,26 +14,85 @@ import com.sbuddy.app.utils.GameLogic
 
 class ScoreActivity : AppCompatActivity() {
 
+    private var scoreP1 = 0
+    private var scoreP2 = 0
     private val gameLogic = GameLogic()
-    private lateinit var txtScoreP1: TextView
-    private lateinit var txtScoreP2: TextView
-    private lateinit var txtServiceInfo: TextView
+    private var currentServer = "Team 1" // Tracks which team is serving
+
+    // Configuration from MatchSetup
+    private var maxScore = 21
+    private var team1Name = "Team 1"
+    private var team2Name = "Team 2"
+    private var isSingles = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_score)
 
-        txtScoreP1 = findViewById(R.id.score_p1)
-        txtScoreP2 = findViewById(R.id.score_p2)
-        txtServiceInfo = findViewById(R.id.service_info)
+        // Get extras
+        maxScore = intent.getIntExtra("MAX_SCORE", 21)
+        team1Name = intent.getStringExtra("TEAM_1_NAME") ?: "Team 1"
+        team2Name = intent.getStringExtra("TEAM_2_NAME") ?: "Team 2"
+        isSingles = intent.getBooleanExtra("IS_SINGLES", false)
+
+        val txtInfo = findViewById<TextView>(R.id.txt_match_info)
+        val typeStr = if (isSingles) "Singles" else "Doubles"
+        txtInfo.text = "$typeStr Match • First to $maxScore"
+
+        val txtTeam1 = findViewById<TextView>(R.id.txt_team1_name)
+        val txtTeam2 = findViewById<TextView>(R.id.txt_team2_name)
+        txtTeam1.text = team1Name
+        txtTeam2.text = team2Name
+
+        val txtScoreP1 = findViewById<TextView>(R.id.score_p1)
+        val txtScoreP2 = findViewById<TextView>(R.id.score_p2)
 
         val btnP1Add = findViewById<Button>(R.id.btn_p1_add)
         val btnP1Minus = findViewById<Button>(R.id.btn_p1_minus)
         val btnP2Add = findViewById<Button>(R.id.btn_p2_add)
-        val btnUndo = findViewById<Button>(R.id.btn_undo)
+        val btnP2Minus = findViewById<Button>(R.id.btn_p2_minus)
+        val btnReset = findViewById<Button>(R.id.btn_reset)
+
+        fun updateUI() {
+            txtScoreP1.text = scoreP1.toString()
+            txtScoreP2.text = scoreP2.toString()
+
+            val cardTeam1 = findViewById<CardView>(R.id.card_team1)
+            val cardTeam2 = findViewById<CardView>(R.id.card_team2)
+            val lblServingT1 = findViewById<TextView>(R.id.lbl_serving_t1)
+            val lblServingT2 = findViewById<TextView>(R.id.lbl_serving_t2)
+
+            // Visual logic for serving
+            // If T1 is serving: T1 card purple, text white. T2 card white, text black.
+            if (currentServer == "Team 1") {
+                cardTeam1.setCardBackgroundColor(Color.parseColor("#E1BEE7")) // Light Purple
+                cardTeam2.setCardBackgroundColor(Color.WHITE)
+                lblServingT1.visibility = View.VISIBLE
+                lblServingT2.visibility = View.INVISIBLE
+            } else {
+                cardTeam1.setCardBackgroundColor(Color.WHITE)
+                cardTeam2.setCardBackgroundColor(Color.parseColor("#E1BEE7"))
+                lblServingT1.visibility = View.INVISIBLE
+                lblServingT2.visibility = View.VISIBLE
+            }
+        }
+
+        fun checkGameOver() {
+            if (scoreP1 >= maxScore || scoreP2 >= maxScore) {
+                // Simplified win condition: reach max score (badminton usually needs 2 point lead)
+                // For this task, we assume strict "Points to Win"
+                val winner = if (scoreP1 > scoreP2) team1Name else team2Name
+                showGameOverDialog(winner, "$scoreP1 - $scoreP2")
+            }
+        }
 
         btnP1Add.setOnClickListener {
-            gameLogic.addPoint(gameLogic.getP1Name())
+            scoreP1++
+            // In badminton, if serving side wins point, they keep serving.
+            // If receiving side wins point, they become server.
+            // Assuming simplified logic: if P1 scored, they might become server if they weren't.
+            // Actually, let's just say whoever scores becomes/stays server for visual simplicity if not specified.
+            currentServer = "Team 1"
             updateUI()
             checkGameOver()
         }
@@ -51,76 +105,27 @@ class ScoreActivity : AppCompatActivity() {
         }
 
         btnP2Add.setOnClickListener {
-            gameLogic.addPoint(gameLogic.getP2Name())
+            scoreP2++
+            currentServer = "Team 2"
             updateUI()
+            checkGameOver()
         }
 
-        btnUndo.setOnClickListener {
-            gameLogic.undo()
-            updateUI()
-        }
-
-        showSetupDialog()
-    }
-
-    private fun showSetupDialog() {
-        val layout = LinearLayout(this)
-        layout.orientation = LinearLayout.VERTICAL
-        layout.setPadding(50, 40, 50, 10)
-
-        val inputP1 = EditText(this)
-        inputP1.hint = "Player 1 Name"
-        layout.addView(inputP1)
-
-        val inputP2 = EditText(this)
-        inputP2.hint = "Player 2 Name"
-        layout.addView(inputP2)
-
-        val checkDoubles = CheckBox(this)
-        checkDoubles.text = "Doubles Match"
-        checkDoubles.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                inputP1.hint = "Team 1 Name"
-                inputP2.hint = "Team 2 Name"
-            } else {
-                inputP1.hint = "Player 1 Name"
-                inputP2.hint = "Player 2 Name"
-            }
-        }
-        layout.addView(checkDoubles)
-
-        val radioGroup = RadioGroup(this)
-        radioGroup.orientation = RadioGroup.HORIZONTAL
-        val rb15 = RadioButton(this); rb15.text = "15"; radioGroup.addView(rb15)
-        val rb21 = RadioButton(this); rb21.text = "21"; rb21.isChecked = true; radioGroup.addView(rb21)
-        val rb30 = RadioButton(this); rb30.text = "30"; radioGroup.addView(rb30)
-        layout.addView(radioGroup)
-
-        val dialog = AlertDialog.Builder(this)
-            .setTitle("Match Setup")
-            .setView(layout)
-            .setCancelable(false)
-            .setPositiveButton("Start Match") { _, _ ->
-                val p1 = inputP1.text.toString()
-                val p2 = inputP2.text.toString()
-                val isDoubles = checkDoubles.isChecked
-                val points = when {
-                    rb15.isChecked -> 15
-                    rb30.isChecked -> 30
-                    else -> 21
-                }
-                gameLogic.setRules(points, p1, p2, isDoubles)
+        btnP2Minus.setOnClickListener {
+             if (scoreP2 > 0) {
+                scoreP2--
                 updateUI()
             }
-            .create()
+        }
 
-        dialog.show()
-    }
+        btnReset.setOnClickListener {
+            scoreP1 = 0
+            scoreP2 = 0
+            currentServer = "Team 1"
+            updateUI()
+        }
 
-    private fun updateUI() {
-        txtScoreP1.text = gameLogic.getScoreP1().toString()
-        txtScoreP2.text = gameLogic.getScoreP2().toString()
-        txtServiceInfo.text = gameLogic.getServiceStatus()
+        updateUI()
     }
 
     private fun showGameOverDialog(winnerName: String, finalScore: String) {

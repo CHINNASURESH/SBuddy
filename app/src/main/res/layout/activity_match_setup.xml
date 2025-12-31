@@ -39,28 +39,20 @@
                     android:text="Match Setup"
                     android:textSize="20sp"
                     android:textStyle="bold"
-                    android:layout_marginBottom="8dp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Configure your badminton match details."
-                    android:textColor="#757575"
                     android:layout_marginBottom="24dp"/>
 
-                <!-- Game Type and Points Row -->
-                <LinearLayout
+                <!-- Game Type (Left) and Points (Right) -->
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     android:layout_marginBottom="16dp">
 
+                    <!-- Game Type Dropdown (Left Corner) -->
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:orientation="vertical"
-                        android:layout_marginEnd="8dp">
+                        android:layout_alignParentStart="true">
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -69,17 +61,18 @@
                             android:layout_marginBottom="4dp"/>
                         <Spinner
                             android:id="@+id/spinner_game_type"
-                            android:layout_width="match_parent"
+                            android:layout_width="140dp"
                             android:layout_height="48dp"
                             android:background="#E0E0E0"/>
                     </LinearLayout>
 
+                    <!-- Points Dropdown (Right Top Corner) -->
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:orientation="vertical"
-                        android:layout_marginStart="8dp">
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentTop="true">
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -88,11 +81,23 @@
                             android:layout_marginBottom="4dp"/>
                         <Spinner
                             android:id="@+id/spinner_points"
-                            android:layout_width="match_parent"
+                            android:layout_width="140dp"
                             android:layout_height="48dp"
                             android:background="#E0E0E0"/>
                     </LinearLayout>
-                </LinearLayout>
+                </RelativeLayout>
+
+                <!-- Custom Points Input (Hidden by default) -->
+                <EditText
+                    android:id="@+id/input_custom_points"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter Custom Points"
+                    android:inputType="number"
+                    android:visibility="gone"
+                    android:layout_marginBottom="16dp"
+                    android:background="#E0E0E0"
+                    android:padding="12dp"/>
 
                 <!-- Team 1 -->
                 <TextView
@@ -100,6 +105,7 @@
                     android:layout_height="wrap_content"
                     android:text="Team 1"
                     android:textStyle="bold"
+                    android:textSize="16sp"
                     android:layout_marginBottom="8dp"/>
 
                 <EditText
@@ -126,6 +132,7 @@
                     android:layout_height="wrap_content"
                     android:text="Team 2"
                     android:textStyle="bold"
+                    android:textSize="16sp"
                     android:layout_marginBottom="8dp"/>
 
                 <EditText

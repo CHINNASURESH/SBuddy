@@ -4,94 +4,69 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="24dp"
+    android:padding="32dp"
     android:background="#F5F5F5">
 
+    <!-- App Name -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ScoreAce"
-        android:textSize="32sp"
+        android:text="SBuddy"
+        android:textSize="40sp"
         android:textStyle="bold"
         android:textColor="#333333"
-        android:drawablePadding="8dp"
-        android:layout_marginBottom="32dp"/>
-        <!-- Add drawableTop for icon if available -->
+        android:layout_marginBottom="16dp"/>
 
+    <!-- Welcome Text -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Welcome Back"
+        android:text="Welcome"
         android:textSize="24sp"
-        android:textStyle="bold"
         android:textColor="#000000"
-        android:layout_marginBottom="8dp"/>
+        android:layout_marginBottom="48dp"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Enter your credentials to access your account."
-        android:textColor="#757575"
-        android:layout_marginBottom="32dp"/>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Email or Mobile No."
-        android:textStyle="bold"
-        android:layout_marginBottom="4dp"/>
-
+    <!-- Sign In Inputs -->
     <EditText
         android:id="@+id/username"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="56dp"
         android:background="#E0E0E0"
-        android:hint="you@example.com or 123-456-7890"
-        android:padding="12dp"
+        android:hint="Email or User ID"
+        android:padding="16dp"
         android:layout_marginBottom="16dp"
         android:inputType="textEmailAddress" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Password"
-        android:textStyle="bold"
-        android:layout_marginBottom="4dp"/>
 
     <EditText
         android:id="@+id/password"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="56dp"
         android:background="#E0E0E0"
-        android:layout_marginBottom="24dp"
-        android:padding="12dp"
+        android:hint="Password"
+        android:padding="16dp"
+        android:layout_marginBottom="32dp"
         android:inputType="textPassword" />
 
+    <!-- Sign In Button -->
     <Button
         android:id="@+id/login"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="64dp"
         android:text="Sign In"
         android:backgroundTint="#9C27B0"
         android:textColor="#FFFFFF"
+        android:textSize="18sp"
         android:textStyle="bold"
         android:textAllCaps="false"/>
 
+    <!-- Sign Up Prompt -->
     <TextView
         android:id="@+id/sign_up_prompt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="24dp"
         android:text="Don't have an account? Sign up"
+        android:textSize="16sp"
         android:textColor="#000000" />
-
-    <Button
-        android:id="@+id/guest_login"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Continue as Guest"
-        android:textColor="#757575"/>
 
 </LinearLayout>

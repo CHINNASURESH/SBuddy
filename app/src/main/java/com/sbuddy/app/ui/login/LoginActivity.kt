@@ -21,7 +21,6 @@ class LoginActivity : AppCompatActivity() {
         val username = findViewById<EditText>(R.id.username)
         val password = findViewById<EditText>(R.id.password)
         val loginButton = findViewById<Button>(R.id.login)
-        val guestButton = findViewById<Button>(R.id.guest_login)
 
         loginButton.setOnClickListener {
             // Placeholder authentication logic
@@ -31,10 +30,6 @@ class LoginActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "Please enter username and password", Toast.LENGTH_SHORT).show()
             }
-        }
-
-        guestButton.setOnClickListener {
-             navigateToMain()
         }
     }
 
