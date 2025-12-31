@@ -23,15 +23,15 @@
             android:textStyle="bold"
             android:textColor="#000000"/>
 
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@android:drawable/ic_menu_myplaces"
-            android:background="#E0E0E0"
-            android:padding="8dp"/>
-    </LinearLayout>
+    <Button
+        android:id="@+id/btn_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="Login / Sign Up" />
 
-    <TextView
+    <Button
+        android:id="@+id/btn_score_match"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="16dp"
