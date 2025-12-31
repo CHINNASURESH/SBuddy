@@ -1,19 +1,60 @@
 package com.sbuddy.app.ui.tournament
 
 import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.sbuddy.app.R
+import com.sbuddy.app.utils.TournamentManager
 
 class TournamentActivity : AppCompatActivity() {
+
+    private val participants = mutableListOf<String>()
+    private val tournamentManager = TournamentManager()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tournament)
 
-        // Logic for creating tournament and generating fixtures would go here
-        // This includes selecting participants and choosing seeding options
+        val etName = findViewById<EditText>(R.id.et_participant_name)
+        val btnAdd = findViewById<Button>(R.id.btn_add_participant)
+        val txtList = findViewById<TextView>(R.id.txt_participants_list)
+        val btnGenerate = findViewById<Button>(R.id.btn_generate_fixtures)
+        val txtFixtures = findViewById<TextView>(R.id.txt_fixtures)
 
-        val tournamentManager = com.sbuddy.app.utils.TournamentManager()
-        // Example usage:
-        // val fixtures = tournamentManager.generateFixtures(listOf("Player A", "Player B", "Player C", "Player D"))
+        btnAdd.setOnClickListener {
+            val name = etName.text.toString().trim()
+            if (name.isNotEmpty()) {
+                participants.add(name)
+                etName.text.clear()
+                updateListUI(txtList)
+            }
+        }
+
+        btnGenerate.setOnClickListener {
+            if (participants.size < 2) {
+                Toast.makeText(this, "Add at least 2 participants", Toast.LENGTH_SHORT).show()
+            } else {
+                val fixtures = tournamentManager.generateFixtures(participants)
+                val fixtureText = StringBuilder()
+                fixtureText.append("Round 1 Fixtures:\n\n")
+
+                fixtures.forEach { match ->
+                    fixtureText.append("${match.player1Name} vs ${match.player2Name}\n")
+                    if (match.winner != null) {
+                         fixtureText.append("  (Winner: ${match.winner})\n")
+                    }
+                    fixtureText.append("\n")
+                }
+
+                txtFixtures.text = fixtureText.toString()
+            }
+        }
+    }
+
+    private fun updateListUI(textView: TextView) {
+        textView.text = "Participants: " + participants.joinToString(", ")
     }
 }
