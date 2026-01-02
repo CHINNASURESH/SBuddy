@@ -1,10 +1,5 @@
 package com.sbuddy.app.utils
 
-import com.sbuddy.app.data.model.Match
-import com.sbuddy.app.data.repository.MatchRepository
-import java.util.Stack
-import java.util.UUID
-
 class GameLogic {
 
     enum class ServerSide {
@@ -126,13 +121,9 @@ class GameLogic {
      * AI Server Highlighting logic.
      * Returns a string description of who should be serving and from which side.
      */
-    fun getServiceStatus(): String {
-        if (isGameOver()) {
-            return "Game Over! Winner: ${getWinner()}"
-        }
-        val serverScore = if (currentServer == p1Name) scoreP1 else scoreP2
-        val side = getServerSide(serverScore)
+    fun getServiceStatus(serverName: String, score: Int): String {
+        val side = getServerSide(score)
         val sideString = if (side == ServerSide.RIGHT) "Right Court" else "Left Court"
-        return "$currentServer serving from $sideString"
+        return "$serverName serving from $sideString"
     }
 }
