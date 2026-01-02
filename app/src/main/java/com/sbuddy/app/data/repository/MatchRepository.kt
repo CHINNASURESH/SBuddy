@@ -10,6 +10,6 @@ object MatchRepository {
     }
 
     fun getMatches(): List<Match> {
-        return matches.toList()
+        return matches.toList().reversed()
     }
 }

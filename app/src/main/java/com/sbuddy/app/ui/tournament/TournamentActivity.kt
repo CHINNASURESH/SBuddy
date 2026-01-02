@@ -19,16 +19,21 @@ class TournamentActivity : AppCompatActivity() {
         setContentView(R.layout.activity_tournament)
 
         val etName = findViewById<EditText>(R.id.et_participant_name)
+        val cbSeed = findViewById<android.widget.CheckBox>(R.id.cb_top_seed)
         val btnAdd = findViewById<Button>(R.id.btn_add_participant)
         val txtList = findViewById<TextView>(R.id.txt_participants_list)
         val btnGenerate = findViewById<Button>(R.id.btn_generate_fixtures)
         val txtFixtures = findViewById<TextView>(R.id.txt_fixtures)
 
         btnAdd.setOnClickListener {
-            val name = etName.text.toString().trim()
+            var name = etName.text.toString().trim()
             if (name.isNotEmpty()) {
+                if (cbSeed.isChecked) {
+                    name += " (Seed)"
+                }
                 participants.add(name)
                 etName.text.clear()
+                cbSeed.isChecked = false
                 updateListUI(txtList)
             }
         }

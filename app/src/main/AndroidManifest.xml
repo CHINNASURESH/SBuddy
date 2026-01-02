@@ -27,6 +27,7 @@
         <activity
             android:name=".ui.tournament.TournamentActivity"
             android:configChanges="orientation|screenSize|keyboardHidden" />
+        <activity android:name=".ui.buddy.BuddyGroupActivity" />
 
     </application>
 

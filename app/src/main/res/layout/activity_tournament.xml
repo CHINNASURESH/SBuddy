@@ -14,11 +14,40 @@
         android:layout_marginBottom="16dp"/>
 
     <EditText
-        android:id="@+id/et_participant_name"
+        android:id="@+id/et_tournament_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter participant name"
-        android:inputType="textPersonName"/>
+        android:hint="Tournament Name"
+        android:inputType="textCapWords"
+        android:layout_marginBottom="8dp"/>
+
+    <EditText
+        android:id="@+id/et_category"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Category (e.g., U19)"
+        android:inputType="text"
+        android:layout_marginBottom="16dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/et_participant_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Participant Name"
+            android:inputType="textPersonName"/>
+
+        <CheckBox
+            android:id="@+id/cb_top_seed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Top Seed"/>
+    </LinearLayout>
 
     <Button
         android:id="@+id/btn_add_participant"

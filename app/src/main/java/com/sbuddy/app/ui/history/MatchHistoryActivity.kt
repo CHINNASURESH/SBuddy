@@ -18,7 +18,8 @@ class MatchHistoryActivity : AppCompatActivity() {
 
         val matches = MatchRepository.getMatches()
         val displayList = matches.map { match ->
-            "${match.player1Name} vs ${match.player2Name}: ${match.player1Score}-${match.player2Score} (Winner: ${match.winner})"
+            val type = if (match.isDoubles) "Doubles" else "Singles"
+            "[$type] ${match.player1Name} vs ${match.player2Name}\nScore: ${match.player1Score}-${match.player2Score}\nWinner: ${match.winner}"
         }
 
         val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, displayList)

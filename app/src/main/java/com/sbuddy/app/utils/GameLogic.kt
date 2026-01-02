@@ -83,7 +83,8 @@ class GameLogic {
             player2Name = p2Name,
             player1Score = scoreP1,
             player2Score = scoreP2,
-            winner = getWinner()
+            winner = getWinner(),
+            isDoubles = isDoubles
         )
         MatchRepository.addMatch(match)
     }
