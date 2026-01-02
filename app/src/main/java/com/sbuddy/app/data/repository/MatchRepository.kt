@@ -12,8 +12,7 @@ class MatchRepository {
         // For now, we just define the method structure
     }
 
-    fun getHistory(userId: String, callback: (List<Match>) -> Unit) {
-        // db.collection("matches").whereEqualTo("userId", userId)...
-        callback(emptyList())
+    fun getMatches(): List<Match> {
+        return matches.toList().reversed()
     }
 }

@@ -5,10 +5,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.GravityCompat
-import androidx.drawerlayout.widget.DrawerLayout
-import com.google.android.material.navigation.NavigationView
-import com.sbuddy.app.ui.scoring.MatchSetupActivity
+import com.sbuddy.app.ui.buddy.BuddyGroupActivity
 import com.sbuddy.app.ui.history.MatchHistoryActivity
 import com.sbuddy.app.ui.tournament.TournamentActivity
 
@@ -49,30 +46,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.nav_dashboard -> {
-                // Already here
-            }
-            R.id.nav_new_game -> {
-                startActivity(Intent(this, MatchSetupActivity::class.java))
-            }
-            R.id.nav_history -> {
-                startActivity(Intent(this, MatchHistoryActivity::class.java))
-            }
-            R.id.nav_tournaments -> {
-                startActivity(Intent(this, TournamentActivity::class.java))
-            }
-        }
-        drawerLayout.closeDrawer(GravityCompat.START)
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menu?.add(0, 1, 0, "Settings")
+        menu?.add(0, 2, 1, "History")
+        menu?.add(0, 3, 2, "Buddy Group")
         return true
     }
 
-    override fun onBackPressed() {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START)
-        } else {
-            super.onBackPressed()
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            1 -> Toast.makeText(this, "Settings clicked", Toast.LENGTH_SHORT).show()
+            2 -> startActivity(Intent(this, MatchHistoryActivity::class.java))
+            3 -> startActivity(Intent(this, BuddyGroupActivity::class.java))
         }
     }
 }

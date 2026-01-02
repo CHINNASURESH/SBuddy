@@ -7,24 +7,48 @@
     android:background="#F5F5F5"
     android:padding="16dp">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create Tournament"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"/>
+
+    <EditText
+        android:id="@+id/et_tournament_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tournament Name"
+        android:inputType="textCapWords"
+        android:layout_marginBottom="8dp"/>
+
+    <EditText
+        android:id="@+id/et_category"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Category (e.g., U19)"
+        android:inputType="text"
+        android:layout_marginBottom="16dp"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginBottom="16dp">
-        <TextView
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/et_participant_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Tournaments"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:textColor="#000000"/>
-        <ImageView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:src="@android:drawable/ic_menu_myplaces"/>
+            android:hint="Participant Name"
+            android:inputType="textPersonName"/>
+
+        <CheckBox
+            android:id="@+id/cb_top_seed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Top Seed"/>
     </LinearLayout>
 
     <LinearLayout

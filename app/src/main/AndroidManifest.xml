@@ -18,11 +18,15 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.scoring.ScoreActivity" />
-        <activity android:name=".ui.scoring.MatchSetupActivity" />
-        <activity android:name=".ui.history.MatchHistoryActivity" />
-        <activity android:name=".ui.tournament.TournamentActivity" />
-        <activity android:name=".MainActivity" />
+        <activity android:name=".ui.login.LoginActivity" />
+
+        <activity
+            android:name=".ui.scoring.ScoreActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+        <activity
+            android:name=".ui.tournament.TournamentActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+        <activity android:name=".ui.buddy.BuddyGroupActivity" />
 
     </application>
 

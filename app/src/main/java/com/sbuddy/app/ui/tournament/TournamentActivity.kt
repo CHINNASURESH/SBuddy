@@ -18,19 +18,23 @@ class TournamentActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tournament)
 
-        val inputName = findViewById<EditText>(R.id.input_player_name)
-        val btnAdd = findViewById<Button>(R.id.btn_add_player)
-        val btnGenerate = findViewById<Button>(R.id.btn_generate_random)
-        val txtCount = findViewById<TextView>(R.id.txt_participants_count)
-        val txtBracket = findViewById<TextView>(R.id.txt_bracket)
+        val etName = findViewById<EditText>(R.id.et_participant_name)
+        val cbSeed = findViewById<android.widget.CheckBox>(R.id.cb_top_seed)
+        val btnAdd = findViewById<Button>(R.id.btn_add_participant)
+        val txtList = findViewById<TextView>(R.id.txt_participants_list)
+        val btnGenerate = findViewById<Button>(R.id.btn_generate_fixtures)
+        val txtFixtures = findViewById<TextView>(R.id.txt_fixtures)
 
         btnAdd.setOnClickListener {
-            val name = inputName.text.toString().trim()
+            var name = etName.text.toString().trim()
             if (name.isNotEmpty()) {
+                if (cbSeed.isChecked) {
+                    name += " (Seed)"
+                }
                 participants.add(name)
-                inputName.text.clear()
-                txtCount.text = "Participants: ${participants.size}"
-                Toast.makeText(this, "Added $name", Toast.LENGTH_SHORT).show()
+                etName.text.clear()
+                cbSeed.isChecked = false
+                updateListUI(txtList)
             }
         }
 

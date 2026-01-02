@@ -70,7 +70,11 @@ class MatchHistoryAdapter(private var matches: List<Match>) : RecyclerView.Adapt
         holder.date.text = sdf.format(Date(match.timestamp))
     }
 
-    override fun getItemCount() = matches.size
+        val matches = MatchRepository.getMatches()
+        val displayList = matches.map { match ->
+            val type = if (match.isDoubles) "Doubles" else "Singles"
+            "[$type] ${match.player1Name} vs ${match.player2Name}\nScore: ${match.player1Score}-${match.player2Score}\nWinner: ${match.winner}"
+        }
 
     fun updateList(newMatches: List<Match>) {
         matches = newMatches
