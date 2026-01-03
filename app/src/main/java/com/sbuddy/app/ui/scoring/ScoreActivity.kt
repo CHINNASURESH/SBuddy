@@ -1,6 +1,9 @@
 package com.sbuddy.app.ui.scoring
 
+import android.content.DialogInterface
+import android.graphics.Color
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
@@ -10,6 +13,7 @@ import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import com.sbuddy.app.R
 import com.sbuddy.app.utils.GameLogic
 
@@ -29,12 +33,21 @@ class ScoreActivity : AppCompatActivity() {
         txtServiceInfo = findViewById(R.id.service_info)
 
         val btnP1Add = findViewById<Button>(R.id.btn_p1_add)
+        val btnP1Minus = findViewById<Button>(R.id.btn_p1_minus)
         val btnP2Add = findViewById<Button>(R.id.btn_p2_add)
         val btnUndo = findViewById<Button>(R.id.btn_undo)
 
         btnP1Add.setOnClickListener {
             gameLogic.addPoint(gameLogic.getP1Name())
             updateUI()
+            checkGameOver()
+        }
+
+        btnP1Minus.setOnClickListener {
+            if (scoreP1 > 0) {
+                scoreP1--
+                updateUI()
+            }
         }
 
         btnP2Add.setOnClickListener {
@@ -108,5 +121,28 @@ class ScoreActivity : AppCompatActivity() {
         txtScoreP1.text = gameLogic.getScoreP1().toString()
         txtScoreP2.text = gameLogic.getScoreP2().toString()
         txtServiceInfo.text = gameLogic.getServiceStatus()
+    }
+
+    private fun showGameOverDialog(winnerName: String, finalScore: String) {
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("🏆 Game Over!")
+            .setMessage("$winnerName wins the game!\nFinal Score: $finalScore")
+            .setCancelable(false)
+            .setPositiveButton("New Game") { _, _ ->
+                finish() // Go back to setup
+            }
+            .setNegativeButton("Rematch") { _, _ ->
+                scoreP1 = 0
+                scoreP2 = 0
+                // Keep server same or swap? Let's reset to T1
+                currentServer = "Team 1"
+                // Refresh UI
+                val txtScoreP1 = findViewById<TextView>(R.id.score_p1)
+                val txtScoreP2 = findViewById<TextView>(R.id.score_p2)
+                txtScoreP1.text = "0"
+                txtScoreP2.text = "0"
+            }
+            .create()
+        dialog.show()
     }
 }
