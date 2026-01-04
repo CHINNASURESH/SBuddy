@@ -13,7 +13,10 @@ import com.sbuddy.app.ui.login.LoginActivity
 import com.sbuddy.app.ui.scoring.ScoreActivity
 import com.sbuddy.app.ui.tournament.TournamentActivity
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+
+    private lateinit var drawerLayout: DrawerLayout
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -26,7 +29,11 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, ScoreActivity::class.java))
         }
 
-        findViewById<Button>(R.id.btn_tournament).setOnClickListener {
+        findViewById<android.view.View>(R.id.card_history).setOnClickListener {
+            startActivity(Intent(this, MatchHistoryActivity::class.java))
+        }
+
+        findViewById<android.view.View>(R.id.card_tournaments).setOnClickListener {
             startActivity(Intent(this, TournamentActivity::class.java))
         }
     }
