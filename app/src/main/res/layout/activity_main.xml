@@ -15,6 +15,13 @@
         android:layout_marginBottom="32dp"/>
 
     <Button
+        android:id="@+id/btn_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="Login / Sign Up" />
+
+    <Button
         android:id="@+id/btn_score_match"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -1,19 +1,15 @@
 package com.sbuddy.app.data.repository
 
-import com.google.firebase.firestore.FirebaseFirestore
 import com.sbuddy.app.data.model.Match
 
-class MatchRepository {
-    private val db: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
+object MatchRepository {
+    private val matches = mutableListOf<Match>()
 
-    fun saveMatch(match: Match) {
-        // In a real app, this would be:
-        // db.collection("matches").add(match)
-        // For now, we just define the method structure
+    fun addMatch(match: Match) {
+        matches.add(match)
     }
 
-    fun getHistory(userId: String, callback: (List<Match>) -> Unit) {
-        // db.collection("matches").whereEqualTo("userId", userId)...
-        callback(emptyList())
+    fun getMatches(): List<Match> {
+        return matches.toList().reversed()
     }
 }

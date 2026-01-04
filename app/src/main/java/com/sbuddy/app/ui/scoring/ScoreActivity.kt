@@ -2,60 +2,111 @@ package com.sbuddy.app.ui.scoring
 
 import android.os.Bundle
 import android.widget.Button
+import android.widget.CheckBox
+import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.sbuddy.app.R
 import com.sbuddy.app.utils.GameLogic
 
 class ScoreActivity : AppCompatActivity() {
 
-    private var scoreP1 = 0
-    private var scoreP2 = 0
     private val gameLogic = GameLogic()
-
-    // For simplicity, assuming P1 starts serving
-    private var currentServer = "Player 1"
+    private lateinit var txtScoreP1: TextView
+    private lateinit var txtScoreP2: TextView
+    private lateinit var txtServiceInfo: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_score)
 
-        val txtScoreP1 = findViewById<TextView>(R.id.score_p1)
-        val txtScoreP2 = findViewById<TextView>(R.id.score_p2)
-        val txtServiceInfo = findViewById<TextView>(R.id.service_info)
+        txtScoreP1 = findViewById(R.id.score_p1)
+        txtScoreP2 = findViewById(R.id.score_p2)
+        txtServiceInfo = findViewById(R.id.service_info)
 
         val btnP1Add = findViewById<Button>(R.id.btn_p1_add)
         val btnP2Add = findViewById<Button>(R.id.btn_p2_add)
-
-        fun updateUI() {
-            txtScoreP1.text = scoreP1.toString()
-            txtScoreP2.text = scoreP2.toString()
-
-            // Determine who is serving based on who won the last point
-            // This is a simplified logic. In real badminton, if server wins point, they keep serving.
-            // If receiver wins point, they become server.
-            // We need to track who was the LAST server to know who is CURRENTLY serving if we want perfect logic.
-
-            // AI Server Highlighting
-            // Just displaying the rule-based position for the current server
-            val servingScore = if (currentServer == "Player 1") scoreP1 else scoreP2
-            txtServiceInfo.text = gameLogic.getServiceStatus(currentServer, servingScore)
-        }
+        val btnUndo = findViewById<Button>(R.id.btn_undo)
 
         btnP1Add.setOnClickListener {
-            scoreP1++
-            // If P1 was serving, they continue serving.
-            // If P2 was serving, P1 becomes server.
-            currentServer = "Player 1"
+            gameLogic.addPoint(gameLogic.getP1Name())
             updateUI()
         }
 
         btnP2Add.setOnClickListener {
-            scoreP2++
-            currentServer = "Player 2"
+            gameLogic.addPoint(gameLogic.getP2Name())
             updateUI()
         }
 
-        updateUI()
+        btnUndo.setOnClickListener {
+            gameLogic.undo()
+            updateUI()
+        }
+
+        showSetupDialog()
+    }
+
+    private fun showSetupDialog() {
+        val layout = LinearLayout(this)
+        layout.orientation = LinearLayout.VERTICAL
+        layout.setPadding(50, 40, 50, 10)
+
+        val inputP1 = EditText(this)
+        inputP1.hint = "Player 1 Name"
+        layout.addView(inputP1)
+
+        val inputP2 = EditText(this)
+        inputP2.hint = "Player 2 Name"
+        layout.addView(inputP2)
+
+        val checkDoubles = CheckBox(this)
+        checkDoubles.text = "Doubles Match"
+        checkDoubles.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                inputP1.hint = "Team 1 Name"
+                inputP2.hint = "Team 2 Name"
+            } else {
+                inputP1.hint = "Player 1 Name"
+                inputP2.hint = "Player 2 Name"
+            }
+        }
+        layout.addView(checkDoubles)
+
+        val radioGroup = RadioGroup(this)
+        radioGroup.orientation = RadioGroup.HORIZONTAL
+        val rb15 = RadioButton(this); rb15.text = "15"; radioGroup.addView(rb15)
+        val rb21 = RadioButton(this); rb21.text = "21"; rb21.isChecked = true; radioGroup.addView(rb21)
+        val rb30 = RadioButton(this); rb30.text = "30"; radioGroup.addView(rb30)
+        layout.addView(radioGroup)
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Match Setup")
+            .setView(layout)
+            .setCancelable(false)
+            .setPositiveButton("Start Match") { _, _ ->
+                val p1 = inputP1.text.toString()
+                val p2 = inputP2.text.toString()
+                val isDoubles = checkDoubles.isChecked
+                val points = when {
+                    rb15.isChecked -> 15
+                    rb30.isChecked -> 30
+                    else -> 21
+                }
+                gameLogic.setRules(points, p1, p2, isDoubles)
+                updateUI()
+            }
+            .create()
+
+        dialog.show()
+    }
+
+    private fun updateUI() {
+        txtScoreP1.text = gameLogic.getScoreP1().toString()
+        txtScoreP2.text = gameLogic.getScoreP2().toString()
+        txtServiceInfo.text = gameLogic.getServiceStatus()
     }
 }
