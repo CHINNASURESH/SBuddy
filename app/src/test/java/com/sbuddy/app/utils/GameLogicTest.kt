@@ -24,10 +24,28 @@ class GameLogicTest {
 
     @Test
     fun testServiceStatus() {
-        // P1 serving, even score
-        assertEquals("Player 1 serving from Right Court", gameLogic.getServiceStatus("Player 1", 0))
+        gameLogic.setRules(21, "Player 1", "Player 2", false)
 
-        // P1 serving, odd score
-        assertEquals("Player 1 serving from Left Court", gameLogic.getServiceStatus("Player 1", 1))
+        // P1 serving, 0-0 (Even) -> Right
+        assertEquals("Player 1 serving from Right Court", gameLogic.getServiceStatus())
+
+        // P1 wins point -> 1-0. P1 serving from Left
+        gameLogic.addPoint("Player 1")
+        assertEquals("Player 1 serving from Left Court", gameLogic.getServiceStatus())
+    }
+
+    @Test
+    fun test15PointGame() {
+        gameLogic.setRules(15, "Alice", "Bob", false)
+
+        // Advance Alice to 14
+        for (i in 1..14) gameLogic.addPoint("Alice")
+        assertEquals(14, gameLogic.getScoreP1())
+        assertFalse(gameLogic.isGameOver())
+
+        // Alice wins
+        gameLogic.addPoint("Alice")
+        assertTrue(gameLogic.isGameOver())
+        assertEquals("Alice", gameLogic.getWinner())
     }
 }
