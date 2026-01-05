@@ -40,14 +40,6 @@ class ScoreActivity : AppCompatActivity() {
         btnP1Add.setOnClickListener {
             gameLogic.addPoint(gameLogic.getP1Name())
             updateUI()
-            checkGameOver()
-        }
-
-        btnP1Minus.setOnClickListener {
-            if (scoreP1 > 0) {
-                scoreP1--
-                updateUI()
-            }
         }
 
         btnP2Add.setOnClickListener {
@@ -121,28 +113,5 @@ class ScoreActivity : AppCompatActivity() {
         txtScoreP1.text = gameLogic.getScoreP1().toString()
         txtScoreP2.text = gameLogic.getScoreP2().toString()
         txtServiceInfo.text = gameLogic.getServiceStatus()
-    }
-
-    private fun showGameOverDialog(winnerName: String, finalScore: String) {
-        val dialog = AlertDialog.Builder(this)
-            .setTitle("🏆 Game Over!")
-            .setMessage("$winnerName wins the game!\nFinal Score: $finalScore")
-            .setCancelable(false)
-            .setPositiveButton("New Game") { _, _ ->
-                finish() // Go back to setup
-            }
-            .setNegativeButton("Rematch") { _, _ ->
-                scoreP1 = 0
-                scoreP2 = 0
-                // Keep server same or swap? Let's reset to T1
-                currentServer = "Team 1"
-                // Refresh UI
-                val txtScoreP1 = findViewById<TextView>(R.id.score_p1)
-                val txtScoreP2 = findViewById<TextView>(R.id.score_p2)
-                txtScoreP1.text = "0"
-                txtScoreP2.text = "0"
-            }
-            .create()
-        dialog.show()
     }
 }
