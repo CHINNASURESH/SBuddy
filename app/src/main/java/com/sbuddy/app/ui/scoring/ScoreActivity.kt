@@ -1,6 +1,9 @@
 package com.sbuddy.app.ui.scoring
 
+import android.content.DialogInterface
+import android.graphics.Color
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
@@ -10,6 +13,7 @@ import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import com.sbuddy.app.R
 import com.sbuddy.app.utils.GameLogic
 
@@ -29,6 +33,7 @@ class ScoreActivity : AppCompatActivity() {
         txtServiceInfo = findViewById(R.id.service_info)
 
         val btnP1Add = findViewById<Button>(R.id.btn_p1_add)
+        val btnP1Minus = findViewById<Button>(R.id.btn_p1_minus)
         val btnP2Add = findViewById<Button>(R.id.btn_p2_add)
         val btnUndo = findViewById<Button>(R.id.btn_undo)
 
