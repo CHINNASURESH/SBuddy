@@ -18,48 +18,44 @@ class TournamentActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tournament)
 
-        val etName = findViewById<EditText>(R.id.et_participant_name)
-        val cbSeed = findViewById<android.widget.CheckBox>(R.id.cb_top_seed)
-        val btnAdd = findViewById<Button>(R.id.btn_add_participant)
-        val txtList = findViewById<TextView>(R.id.txt_participants_list)
-        val btnGenerate = findViewById<Button>(R.id.btn_generate_fixtures)
-        val txtFixtures = findViewById<TextView>(R.id.txt_fixtures)
+        val inputName = findViewById<EditText>(R.id.input_player_name)
+        val btnAdd = findViewById<Button>(R.id.btn_add_player)
+        val btnGenerate = findViewById<Button>(R.id.btn_generate_random)
+        val txtCount = findViewById<TextView>(R.id.txt_participants_count)
+        val txtBracket = findViewById<TextView>(R.id.txt_bracket)
 
         btnAdd.setOnClickListener {
-            var name = etName.text.toString().trim()
+            val name = inputName.text.toString().trim()
             if (name.isNotEmpty()) {
-                if (cbSeed.isChecked) {
-                    name += " (Seed)"
-                }
                 participants.add(name)
-                etName.text.clear()
-                cbSeed.isChecked = false
-                updateListUI(txtList)
+                inputName.text.clear()
+                txtCount.text = "Participants: ${participants.size}"
+                Toast.makeText(this, "Added $name", Toast.LENGTH_SHORT).show()
             }
         }
 
         btnGenerate.setOnClickListener {
             if (participants.size < 2) {
-                Toast.makeText(this, "Add at least 2 participants", Toast.LENGTH_SHORT).show()
-            } else {
-                val fixtures = tournamentManager.generateFixtures(participants)
-                val fixtureText = StringBuilder()
-                fixtureText.append("Round 1 Fixtures:\n\n")
-
-                fixtures.forEach { match ->
-                    fixtureText.append("${match.player1Name} vs ${match.player2Name}\n")
-                    if (match.winner != null) {
-                         fixtureText.append("  (Winner: ${match.winner})\n")
-                    }
-                    fixtureText.append("\n")
-                }
-
-                txtFixtures.text = fixtureText.toString()
+                Toast.makeText(this, "Need at least 2 participants", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
-        }
-    }
 
-    private fun updateListUI(textView: TextView) {
-        textView.text = "Participants: " + participants.joinToString(", ")
+            val fixtures = tournamentManager.generateFixtures(participants)
+            val sb = StringBuilder()
+
+            sb.append("Round 1 Fixtures:\n\n")
+            fixtures.forEachIndexed { index, match ->
+                sb.append("Match ${index + 1}:\n")
+                if (match.player2Name == "BYE") {
+                    sb.append("${match.player1Name} gets a BYE\n")
+                } else {
+                    sb.append("${match.player1Name} vs ${match.player2Name}\n")
+                }
+                sb.append("\n")
+            }
+
+            txtBracket.text = sb.toString()
+            txtBracket.gravity = android.view.Gravity.START
+        }
     }
 }

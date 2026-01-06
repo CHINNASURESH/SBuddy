@@ -2,15 +2,14 @@ package com.sbuddy.app
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
 import android.view.MenuItem
-import android.widget.Button
-import android.widget.Toast
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import com.sbuddy.app.ui.buddy.BuddyGroupActivity
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import com.google.android.material.navigation.NavigationView
+import com.sbuddy.app.ui.scoring.MatchSetupActivity
 import com.sbuddy.app.ui.history.MatchHistoryActivity
-import com.sbuddy.app.ui.login.LoginActivity
-import com.sbuddy.app.ui.scoring.ScoreActivity
 import com.sbuddy.app.ui.tournament.TournamentActivity
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -21,12 +20,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        findViewById<Button>(R.id.btn_login).setOnClickListener {
-            startActivity(Intent(this, LoginActivity::class.java))
-        }
+        val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        findViewById<Button>(R.id.btn_score_match).setOnClickListener {
-            startActivity(Intent(this, ScoreActivity::class.java))
+        drawerLayout = findViewById(R.id.drawer_layout)
+        val navView: NavigationView = findViewById(R.id.nav_view)
+
+        val toggle = ActionBarDrawerToggle(
+            this, drawerLayout, toolbar, R.string.app_name, R.string.app_name
+        )
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
+
+        navView.setNavigationItemSelectedListener(this)
+
+        // Card Clicks
+        findViewById<android.view.View>(R.id.card_new_game).setOnClickListener {
+            startActivity(Intent(this, MatchSetupActivity::class.java))
         }
 
         findViewById<android.view.View>(R.id.card_history).setOnClickListener {
@@ -38,19 +49,30 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menu?.add(0, 1, 0, "Settings")
-        menu?.add(0, 2, 1, "History")
-        menu?.add(0, 3, 2, "Buddy Group")
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.nav_dashboard -> {
+                // Already here
+            }
+            R.id.nav_new_game -> {
+                startActivity(Intent(this, MatchSetupActivity::class.java))
+            }
+            R.id.nav_history -> {
+                startActivity(Intent(this, MatchHistoryActivity::class.java))
+            }
+            R.id.nav_tournaments -> {
+                startActivity(Intent(this, TournamentActivity::class.java))
+            }
+        }
+        drawerLayout.closeDrawer(GravityCompat.START)
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            1 -> Toast.makeText(this, "Settings clicked", Toast.LENGTH_SHORT).show()
-            2 -> startActivity(Intent(this, MatchHistoryActivity::class.java))
-            3 -> startActivity(Intent(this, BuddyGroupActivity::class.java))
+    override fun onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START)
+        } else {
+            super.onBackPressed()
         }
-        return super.onOptionsItemSelected(item)
     }
 }
