@@ -11,6 +11,7 @@ import com.google.android.material.navigation.NavigationView
 import com.sbuddy.app.ui.scoring.MatchSetupActivity
 import com.sbuddy.app.ui.history.MatchHistoryActivity
 import com.sbuddy.app.ui.tournament.TournamentActivity
+import com.sbuddy.app.ui.group.BuddyGroupActivity
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -62,6 +63,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             R.id.nav_tournaments -> {
                 startActivity(Intent(this, TournamentActivity::class.java))
+            }
+            R.id.nav_buddy_groups -> {
+                startActivity(Intent(this, BuddyGroupActivity::class.java))
             }
         }
         drawerLayout.closeDrawer(GravityCompat.START)

@@ -22,6 +22,7 @@
         <activity android:name=".ui.scoring.MatchSetupActivity" />
         <activity android:name=".ui.history.MatchHistoryActivity" />
         <activity android:name=".ui.tournament.TournamentActivity" />
+        <activity android:name=".ui.group.BuddyGroupActivity" />
         <activity android:name=".MainActivity" />
 
     </application>
