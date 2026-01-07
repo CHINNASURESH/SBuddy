@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -83,6 +84,7 @@ class GroupAdapter(
         val name: TextView = view.findViewById(R.id.txt_group_name)
         val desc: TextView = view.findViewById(R.id.txt_group_desc)
         val count: TextView = view.findViewById(R.id.txt_member_count)
+        val shareHistory: Button = view.findViewById(R.id.btn_share_history)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -98,6 +100,11 @@ class GroupAdapter(
 
         holder.itemView.setOnClickListener {
             onItemClick(group)
+        }
+
+        holder.shareHistory.setOnClickListener {
+            // Mock share functionality
+            Toast.makeText(holder.itemView.context, "Sharing history with ${group.name}", Toast.LENGTH_SHORT).show()
         }
     }
 

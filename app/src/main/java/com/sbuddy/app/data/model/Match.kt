@@ -7,6 +7,5 @@ data class Match(
     val player1Score: Int = 0,
     val player2Score: Int = 0,
     val timestamp: Long = System.currentTimeMillis(),
-    val winner: String? = null,
-    val isDoubles: Boolean = false
+    val winner: String? = null
 )

@@ -1,28 +1,94 @@
 package com.sbuddy.app.ui.history
 
 import android.os.Bundle
-import android.widget.ArrayAdapter
-import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
-import com.sbuddy.app.data.repository.MatchRepository
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.tabs.TabLayout
+import com.sbuddy.app.R
+import com.sbuddy.app.data.model.Match
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class MatchHistoryActivity : AppCompatActivity() {
 
+    private val allMatches = listOf(
+        Match("1", "Player 1 & Player 2", "Player 3 & Player 4", 21, 16, System.currentTimeMillis(), "Player 1 & Player 2"),
+        Match("2", "Chloe & Dave", "Eve & Frank", 19, 21, System.currentTimeMillis() - 86400000, "Eve & Frank"),
+        Match("3", "Alex & Grace", "Ben & Heidi", 21, 19, System.currentTimeMillis() - 172800000, "Alex & Grace"),
+        Match("4", "Alice", "Bob", 21, 15, System.currentTimeMillis() - 200000000, "Alice"),
+        Match("5", "Alice & Charlie", "Dave & Bob", 21, 18, System.currentTimeMillis() - 250000000, "Alice & Charlie")
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_match_history)
 
-        // Creating a simple layout programmatically for simplicity, or I should create XML.
-        // I'll create a simple ListView programmatically.
-        val listView = ListView(this)
-        setContentView(listView)
+        val titleText = findViewById<TextView>(R.id.txt_history_title) // Need to add ID to layout or just use logic here if ID exists, actually checked XML previously and it was just static text
 
-        val matches = MatchRepository.getMatches()
-        val displayList = matches.map { match ->
-            val type = if (match.isDoubles) "Doubles" else "Singles"
-            "[$type] ${match.player1Name} vs ${match.player2Name}\nScore: ${match.player1Score}-${match.player2Score}\nWinner: ${match.winner}"
+        val userName = intent.getStringExtra("USER_NAME")
+
+        // Filter logic
+        val displayedMatches = if (!userName.isNullOrEmpty()) {
+             // Mock filter: simple string contains
+             allMatches.filter {
+                 it.player1Name.contains(userName, true) || it.player2Name.contains(userName, true)
+             }
+        } else {
+            allMatches
         }
 
-        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, displayList)
-        listView.adapter = adapter
+        val recyclerView = findViewById<RecyclerView>(R.id.recycler_history)
+        val tabLayout = findViewById<TabLayout>(R.id.tab_layout)
+
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        val adapter = MatchHistoryAdapter(displayedMatches)
+        recyclerView.adapter = adapter
+
+        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                // simple shuffle for demo
+                adapter.updateList(displayedMatches.reversed())
+            }
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        })
+    }
+}
+
+class MatchHistoryAdapter(private var matches: List<Match>) : RecyclerView.Adapter<MatchHistoryAdapter.ViewHolder>() {
+
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val date: TextView = view.findViewById(R.id.txt_date)
+        val team1: TextView = view.findViewById(R.id.txt_team1)
+        val team2: TextView = view.findViewById(R.id.txt_team2)
+        val score: TextView = view.findViewById(R.id.txt_score)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_match_history, parent, false)
+        return ViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val match = matches[position]
+        holder.team1.text = match.player1Name
+        holder.team2.text = match.player2Name
+        holder.score.text = "${match.player1Score}-${match.player2Score}"
+
+        val sdf = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+        holder.date.text = sdf.format(Date(match.timestamp))
+    }
+
+    override fun getItemCount() = matches.size
+
+    fun updateList(newMatches: List<Match>) {
+        matches = newMatches
+        notifyDataSetChanged()
     }
 }
