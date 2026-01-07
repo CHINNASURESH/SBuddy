@@ -1,46 +1,55 @@
-# AGENTS.md - SBuddy Android App
+# AGENTS.md - SBuddy Android App (Complete Version)
 
 ## Project Overview
-SBuddy is an Android application designed for badminton players to score matches and organize tournaments. It features real-time scoring with AI-based server highlighting and single-elimination tournament fixture generation.
+SBuddy (also known as Score Ace) is a comprehensive Android application for badminton players. It facilitates real-time match scoring, tournament organization, and player history tracking.
 
-## Environment Setup
-To build this project in this environment, you must verify the Android SDK location and set the environment variable.
+**Latest Version Features:**
+*   **Robust Architecture**: Uses View Binding for type-safe UI interaction and a custom `Theme.SBuddy` for stability.
+*   **UI/UX**: Refined layouts including a Navigation Drawer Dashboard and Card-based interfaces.
+*   **Backend**: Integrated with Firebase (Auth/Firestore) with placeholder repositories for immediate runnability.
 
-*   **SDK Location**: `/usr/lib/android-sdk`
-*   **Command**:
-    ```bash
-    export ANDROID_HOME=/usr/lib/android-sdk
-    ```
+## Key Features
 
-## Build Instructions
-The project uses Gradle with Kotlin DSL.
+### 1. User Authentication
+*   **Login**: Clean UI with Email/Password fields.
+*   **Safety**: Uses View Binding to prevent NullPointerExceptions.
 
-*   **Build Debug APK**:
-    ```bash
-    gradle assembleDebug
-    ```
-    *Note: If you encounter license issues, ensure licenses are accepted or try running with `sudo` permissions on the SDK directory if necessary (though strictly not recommended for production).*
+### 2. Dashboard
+*   **Navigation**: Drawer menu ("Ladder menu") and large Quick Access Tiles.
+*   **Modules**: New Game, History, Tournaments.
 
-## Testing
-Unit tests are located in `app/src/test`.
+### 3. Match Setup & Scoring
+*   **Setup**: Configure Singles/Doubles and Custom Points to Win.
+*   **Scoring**: Large interactive score tiles.
+*   **AI Server Highlight**: Visual indication of the serving team based on score logic.
+*   **Game Over**: Dialog with options for Rematch or New Game.
 
-*   **Run Unit Tests**:
-    ```bash
-    gradle test
-    ```
+### 4. Tournament Management
+*   **Fixture Generation**: Create lists of participants and automatically generate single-elimination brackets (handling Byes).
 
-## Architecture & Code Organization
-The code follows a standard layered architecture:
+### 5. Match History
+*   **Log**: View past matches with details (Date, Players, Score).
 
-*   **`com.sbuddy.app.data`**:
-    *   `model`: Data classes (`User`, `Match`, `Tournament`).
-    *   `repository`: Data access layer (e.g., `MatchRepository`). Currently contains placeholder logic for Firebase.
-*   **`com.sbuddy.app.ui`**:
-    *   Activities and UI logic, organized by feature (`scoring`, `tournament`, `login`).
-*   **`com.sbuddy.app.utils`**:
-    *   `GameLogic.kt`: Core business logic for scoring and server positioning.
-    *   `TournamentManager.kt`: Logic for generating fixtures.
+## Build & Run Instructions
 
-## Configuration Notes
-*   **Firebase**: The project is configured for Firebase (Auth, Firestore).
-*   **`google-services.json`**: A **MOCK** version of this file exists in `app/` to allow the build to pass. For the app to function with a real backend, this file **MUST** be replaced with a valid configuration file from the Firebase Console.
+**Environment Setup**:
+```bash
+export ANDROID_HOME=/usr/lib/android-sdk
+```
+
+**Build Command**:
+```bash
+gradle assembleDebug
+```
+*Note: A mock `google-services.json` is included. Replace it with your real Firebase config for production use.*
+
+**Run Tests**:
+```bash
+gradle test
+```
+
+## Architecture
+*   **Package**: `com.sbuddy.app`
+*   **UI Layer**: `ui.login`, `ui.scoring`, `ui.history`, `ui.tournament`
+*   **Data Layer**: `data.repository`, `data.model`
+*   **Utils**: `GameLogic`, `TournamentManager`
