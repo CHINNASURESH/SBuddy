@@ -20,25 +20,40 @@ class MatchHistoryActivity : AppCompatActivity() {
     private val allMatches = listOf(
         Match("1", "Player 1 & Player 2", "Player 3 & Player 4", 21, 16, System.currentTimeMillis(), "Player 1 & Player 2"),
         Match("2", "Chloe & Dave", "Eve & Frank", 19, 21, System.currentTimeMillis() - 86400000, "Eve & Frank"),
-        Match("3", "Alex & Grace", "Ben & Heidi", 21, 19, System.currentTimeMillis() - 172800000, "Alex & Grace")
+        Match("3", "Alex & Grace", "Ben & Heidi", 21, 19, System.currentTimeMillis() - 172800000, "Alex & Grace"),
+        Match("4", "Alice", "Bob", 21, 15, System.currentTimeMillis() - 200000000, "Alice"),
+        Match("5", "Alice & Charlie", "Dave & Bob", 21, 18, System.currentTimeMillis() - 250000000, "Alice & Charlie")
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_match_history)
 
+        val titleText = findViewById<TextView>(R.id.txt_history_title) // Need to add ID to layout or just use logic here if ID exists, actually checked XML previously and it was just static text
+
+        val userName = intent.getStringExtra("USER_NAME")
+
+        // Filter logic
+        val displayedMatches = if (!userName.isNullOrEmpty()) {
+             // Mock filter: simple string contains
+             allMatches.filter {
+                 it.player1Name.contains(userName, true) || it.player2Name.contains(userName, true)
+             }
+        } else {
+            allMatches
+        }
+
         val recyclerView = findViewById<RecyclerView>(R.id.recycler_history)
         val tabLayout = findViewById<TabLayout>(R.id.tab_layout)
 
         recyclerView.layoutManager = LinearLayoutManager(this)
-        val adapter = MatchHistoryAdapter(allMatches)
+        val adapter = MatchHistoryAdapter(displayedMatches)
         recyclerView.adapter = adapter
 
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                // Filter logic would go here. For now just shuffling/reloading to simulate change
-                // In real app, we filter by Singles/Doubles if we had that flag in Match model
-                adapter.updateList(allMatches.reversed())
+                // simple shuffle for demo
+                adapter.updateList(displayedMatches.reversed())
             }
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
             override fun onTabReselected(tab: TabLayout.Tab?) {}

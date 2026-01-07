@@ -4,5 +4,8 @@ data class BuddyGroup(
     val id: String = "",
     val name: String = "",
     val description: String = "",
-    val memberCount: Int = 0
-)
+    val members: MutableList<String> = mutableListOf()
+) {
+    val memberCount: Int
+        get() = members.size
+}

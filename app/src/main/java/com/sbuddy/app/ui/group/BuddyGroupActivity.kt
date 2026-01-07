@@ -1,6 +1,7 @@
 package com.sbuddy.app.ui.group
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -29,13 +30,24 @@ class BuddyGroupActivity : AppCompatActivity() {
         val recycler = findViewById<RecyclerView>(R.id.recycler_groups)
         val fab = findViewById<FloatingActionButton>(R.id.fab_add_group)
 
-        adapter = GroupAdapter(repository.getGroups())
+        adapter = GroupAdapter(repository.getGroups()) { group ->
+            // Navigate to Detail
+            val intent = Intent(this, GroupDetailActivity::class.java)
+            intent.putExtra("GROUP_ID", group.id)
+            startActivity(intent)
+        }
         recycler.layoutManager = LinearLayoutManager(this)
         recycler.adapter = adapter
 
         fab.setOnClickListener {
             showCreateGroupDialog()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Refresh list in case members were added in Detail screen (mock count update)
+        adapter.updateList(repository.getGroups())
     }
 
     private fun showCreateGroupDialog() {
@@ -62,7 +74,10 @@ class BuddyGroupActivity : AppCompatActivity() {
     }
 }
 
-class GroupAdapter(private var groups: List<BuddyGroup>) : RecyclerView.Adapter<GroupAdapter.ViewHolder>() {
+class GroupAdapter(
+    private var groups: List<BuddyGroup>,
+    private val onItemClick: (BuddyGroup) -> Unit
+) : RecyclerView.Adapter<GroupAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.txt_group_name)
@@ -80,6 +95,10 @@ class GroupAdapter(private var groups: List<BuddyGroup>) : RecyclerView.Adapter<
         holder.name.text = group.name
         holder.desc.text = group.description
         holder.count.text = "${group.memberCount} Members"
+
+        holder.itemView.setOnClickListener {
+            onItemClick(group)
+        }
     }
 
     override fun getItemCount() = groups.size
