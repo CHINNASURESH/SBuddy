@@ -29,8 +29,6 @@ class MatchHistoryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_match_history)
 
-        val titleText = findViewById<TextView>(R.id.txt_history_title) // Need to add ID to layout or just use logic here if ID exists, actually checked XML previously and it was just static text
-
         val userName = intent.getStringExtra("USER_NAME")
 
         // Filter logic
