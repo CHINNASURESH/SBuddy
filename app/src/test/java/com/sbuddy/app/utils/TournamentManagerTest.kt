@@ -8,27 +8,22 @@ class TournamentManagerTest {
     private val manager = TournamentManager()
 
     @Test
-    fun testGenerateFixturesEven() {
+    fun testGenerateBracketText() {
         val participants = listOf("A", "B", "C", "D")
-        val fixtures = manager.generateFixtures(participants)
+        val bracketText = manager.generateBracketText(participants)
 
-        assertEquals(2, fixtures.size)
-        // Check that all players are assigned
-        val assigned = fixtures.flatMap { listOf(it.player1Name, it.player2Name) }
-        assertTrue(assigned.containsAll(participants))
+        assertTrue(bracketText.contains("=== ROUND 1 ==="))
+        assertTrue(bracketText.contains("Match 1:"))
+        assertTrue(bracketText.contains("Match 2:"))
+        assertTrue(bracketText.contains("=== ROUND 2 ===")) // Semi-final / Final depending on logic
+        assertTrue(bracketText.contains("=== WINNER ==="))
     }
 
     @Test
-    fun testGenerateFixturesOdd() {
+    fun testGenerateBracketTextOdd() {
         val participants = listOf("A", "B", "C")
-        val fixtures = manager.generateFixtures(participants)
+        val bracketText = manager.generateBracketText(participants)
 
-        // Should have 1 match (A vs B) and 1 Bye match or similar logic depending on implementation.
-        // My implementation adds a "BYE" match for the odd one out.
-        assertEquals(2, fixtures.size)
-
-        val lastMatch = fixtures.last()
-        assertEquals("BYE", lastMatch.player2Name)
-        assertNotNull(lastMatch.winner)
+        assertTrue(bracketText.contains("BYE"))
     }
 }

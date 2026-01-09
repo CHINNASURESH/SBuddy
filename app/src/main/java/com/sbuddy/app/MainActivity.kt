@@ -12,8 +12,9 @@ import com.sbuddy.app.ui.scoring.MatchSetupActivity
 import com.sbuddy.app.ui.history.MatchHistoryActivity
 import com.sbuddy.app.ui.tournament.TournamentActivity
 import com.sbuddy.app.ui.group.BuddyGroupActivity
+import com.sbuddy.app.ui.profile.UserProfileActivity
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var drawerLayout: DrawerLayout
 
@@ -48,6 +49,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         findViewById<android.view.View>(R.id.card_tournaments).setOnClickListener {
             startActivity(Intent(this, TournamentActivity::class.java))
         }
+
+        // Mock profile icon click (Top right icon in dashboard xml)
+        // Since we don't have a direct ID for it in the previous xml or it was just an imageview,
+        // let's assume it's part of the toolbar or a specific view.
+        // Assuming we need to add a menu item or a view click.
+    }
+
+    override fun onCreateOptionsMenu(menu: android.view.Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.action_profile) {
+            startActivity(Intent(this, UserProfileActivity::class.java))
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {

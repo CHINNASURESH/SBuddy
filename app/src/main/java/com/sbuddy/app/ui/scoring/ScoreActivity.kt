@@ -9,27 +9,31 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import com.sbuddy.app.BaseActivity
 import com.sbuddy.app.R
+import com.sbuddy.app.data.model.Match
+import com.sbuddy.app.data.repository.MatchRepository
 import com.sbuddy.app.utils.GameLogic
+import java.util.UUID
 
-class ScoreActivity : AppCompatActivity() {
+class ScoreActivity : BaseActivity() {
 
     private var scoreP1 = 0
     private var scoreP2 = 0
     private val gameLogic = GameLogic()
-    private var currentServer = "Team 1" // Tracks which team is serving
+    private var currentServer = "Team 1"
 
-    // Configuration from MatchSetup
     private var maxScore = 21
     private var team1Name = "Team 1"
     private var team2Name = "Team 2"
     private var isSingles = false
 
+    private val repository = MatchRepository()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_score)
 
-        // Get extras
         maxScore = intent.getIntExtra("MAX_SCORE", 21)
         team1Name = intent.getStringExtra("TEAM_1_NAME") ?: "Team 1"
         team2Name = intent.getStringExtra("TEAM_2_NAME") ?: "Team 2"
@@ -62,10 +66,8 @@ class ScoreActivity : AppCompatActivity() {
             val lblServingT1 = findViewById<TextView>(R.id.lbl_serving_t1)
             val lblServingT2 = findViewById<TextView>(R.id.lbl_serving_t2)
 
-            // Visual logic for serving
-            // If T1 is serving: T1 card purple, text white. T2 card white, text black.
             if (currentServer == "Team 1") {
-                cardTeam1.setCardBackgroundColor(Color.parseColor("#E1BEE7")) // Light Purple
+                cardTeam1.setCardBackgroundColor(Color.parseColor("#E1BEE7"))
                 cardTeam2.setCardBackgroundColor(Color.WHITE)
                 lblServingT1.visibility = View.VISIBLE
                 lblServingT2.visibility = View.INVISIBLE
@@ -78,20 +80,46 @@ class ScoreActivity : AppCompatActivity() {
         }
 
         fun checkGameOver() {
-            if (scoreP1 >= maxScore || scoreP2 >= maxScore) {
-                // Simplified win condition: reach max score (badminton usually needs 2 point lead)
-                // For this task, we assume strict "Points to Win"
-                val winner = if (scoreP1 > scoreP2) team1Name else team2Name
+            var gameOver = false
+            var winner = ""
+
+            if (maxScore == 30) {
+                // Hard cap at 30
+                if (scoreP1 >= 30) {
+                    gameOver = true
+                    winner = team1Name
+                } else if (scoreP2 >= 30) {
+                    gameOver = true
+                    winner = team2Name
+                }
+            } else {
+                // Standard win by 2 logic (unless user set some weird custom point)
+                if (scoreP1 >= maxScore && (scoreP1 - scoreP2) >= 2) {
+                    gameOver = true
+                    winner = team1Name
+                } else if (scoreP2 >= maxScore && (scoreP2 - scoreP1) >= 2) {
+                    gameOver = true
+                    winner = team2Name
+                } else if (scoreP1 >= 30 || scoreP2 >= 30) {
+                     // Safety cap at 30 even for standard games if they drag on (standard badminton rule)
+                     if (scoreP1 > scoreP2) {
+                         gameOver = true
+                         winner = team1Name
+                     } else {
+                         gameOver = true
+                         winner = team2Name
+                     }
+                }
+            }
+
+            if (gameOver) {
+                saveGame(winner)
                 showGameOverDialog(winner, "$scoreP1 - $scoreP2")
             }
         }
 
         btnP1Add.setOnClickListener {
             scoreP1++
-            // In badminton, if serving side wins point, they keep serving.
-            // If receiving side wins point, they become server.
-            // Assuming simplified logic: if P1 scored, they might become server if they weren't.
-            // Actually, let's just say whoever scores becomes/stays server for visual simplicity if not specified.
             currentServer = "Team 1"
             updateUI()
             checkGameOver()
@@ -128,20 +156,32 @@ class ScoreActivity : AppCompatActivity() {
         updateUI()
     }
 
+    private fun saveGame(winner: String) {
+        val match = Match(
+            id = UUID.randomUUID().toString(),
+            player1Name = team1Name,
+            player2Name = team2Name,
+            player1Score = scoreP1,
+            player2Score = scoreP2,
+            timestamp = System.currentTimeMillis(),
+            winner = winner,
+            isSingles = isSingles
+        )
+        repository.saveMatch(match)
+    }
+
     private fun showGameOverDialog(winnerName: String, finalScore: String) {
         val dialog = AlertDialog.Builder(this)
             .setTitle("🏆 Game Over!")
             .setMessage("$winnerName wins the game!\nFinal Score: $finalScore")
             .setCancelable(false)
             .setPositiveButton("New Game") { _, _ ->
-                finish() // Go back to setup
+                finish()
             }
             .setNegativeButton("Rematch") { _, _ ->
                 scoreP1 = 0
                 scoreP2 = 0
-                // Keep server same or swap? Let's reset to T1
                 currentServer = "Team 1"
-                // Refresh UI
                 val txtScoreP1 = findViewById<TextView>(R.id.score_p1)
                 val txtScoreP2 = findViewById<TextView>(R.id.score_p2)
                 txtScoreP1.text = "0"
