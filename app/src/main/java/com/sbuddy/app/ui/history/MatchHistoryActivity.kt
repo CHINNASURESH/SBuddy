@@ -1,61 +1,69 @@
 package com.sbuddy.app.ui.history
 
 import android.os.Bundle
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.tabs.TabLayout
+import com.sbuddy.app.BaseActivity
 import com.sbuddy.app.R
 import com.sbuddy.app.data.model.Match
+import com.sbuddy.app.data.repository.MatchRepository
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class MatchHistoryActivity : AppCompatActivity() {
+class MatchHistoryActivity : BaseActivity() {
 
-    private val allMatches = listOf(
-        Match("1", "Player 1 & Player 2", "Player 3 & Player 4", 21, 16, System.currentTimeMillis(), "Player 1 & Player 2"),
-        Match("2", "Chloe & Dave", "Eve & Frank", 19, 21, System.currentTimeMillis() - 86400000, "Eve & Frank"),
-        Match("3", "Alex & Grace", "Ben & Heidi", 21, 19, System.currentTimeMillis() - 172800000, "Alex & Grace"),
-        Match("4", "Alice", "Bob", 21, 15, System.currentTimeMillis() - 200000000, "Alice"),
-        Match("5", "Alice & Charlie", "Dave & Bob", 21, 18, System.currentTimeMillis() - 250000000, "Alice & Charlie")
-    )
+    private val repository = MatchRepository()
+    private var allMatches: List<Match> = emptyList()
+    private var currentTab = 0 // 0 = Singles, 1 = Doubles
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_match_history)
 
         val userName = intent.getStringExtra("USER_NAME")
-
-        // Filter logic
-        val displayedMatches = if (!userName.isNullOrEmpty()) {
-             // Mock filter: simple string contains
-             allMatches.filter {
-                 it.player1Name.contains(userName, true) || it.player2Name.contains(userName, true)
-             }
-        } else {
-            allMatches
-        }
-
         val recyclerView = findViewById<RecyclerView>(R.id.recycler_history)
         val tabLayout = findViewById<TabLayout>(R.id.tab_layout)
 
+        val adapter = MatchHistoryAdapter(emptyList())
         recyclerView.layoutManager = LinearLayoutManager(this)
-        val adapter = MatchHistoryAdapter(displayedMatches)
         recyclerView.adapter = adapter
+
+        repository.getHistory { matches ->
+            // Filter by user if needed (Buddy feature)
+            var filtered = matches
+            if (!userName.isNullOrEmpty()) {
+                 filtered = matches.filter {
+                     it.player1Name.contains(userName, true) || it.player2Name.contains(userName, true)
+                 }
+            }
+            allMatches = filtered
+            updateList(adapter)
+        }
 
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                // simple shuffle for demo
-                adapter.updateList(displayedMatches.reversed())
+                currentTab = tab?.position ?: 0
+                updateList(adapter)
             }
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
             override fun onTabReselected(tab: TabLayout.Tab?) {}
         })
+    }
+
+    private fun updateList(adapter: MatchHistoryAdapter) {
+        val filtered = if (currentTab == 0) {
+            allMatches.filter { it.isSingles }
+        } else {
+            allMatches.filter { !it.isSingles }
+        }
+        adapter.updateList(filtered)
     }
 }
 

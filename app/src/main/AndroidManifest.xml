@@ -24,6 +24,8 @@
         <activity android:name=".ui.tournament.TournamentActivity" />
         <activity android:name=".ui.group.BuddyGroupActivity" />
         <activity android:name=".ui.group.GroupDetailActivity" />
+        <activity android:name=".ui.profile.UserProfileActivity" />
+        <activity android:name=".ui.login.SignUpActivity" />
         <activity android:name=".MainActivity" />
 
     </application>

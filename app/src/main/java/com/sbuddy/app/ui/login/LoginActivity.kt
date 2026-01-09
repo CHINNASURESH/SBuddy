@@ -4,11 +4,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.sbuddy.app.BaseActivity
 import com.sbuddy.app.MainActivity
 import com.sbuddy.app.data.repository.AuthRepository
 import com.sbuddy.app.databinding.ActivityLoginBinding
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : BaseActivity() {
 
     private val authRepository = AuthRepository()
     private lateinit var binding: ActivityLoginBinding
@@ -32,7 +33,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
         binding.signUpPrompt.setOnClickListener {
-             Toast.makeText(this, "Sign up screen is not implemented yet.", Toast.LENGTH_SHORT).show()
+             startActivity(Intent(this, SignUpActivity::class.java))
         }
     }
 

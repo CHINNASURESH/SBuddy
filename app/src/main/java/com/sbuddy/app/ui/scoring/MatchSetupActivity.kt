@@ -10,9 +10,10 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.sbuddy.app.BaseActivity
 import com.sbuddy.app.R
 
-class MatchSetupActivity : AppCompatActivity() {
+class MatchSetupActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

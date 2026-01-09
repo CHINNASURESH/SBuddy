@@ -14,11 +14,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import com.sbuddy.app.BaseActivity
 import com.sbuddy.app.R
 import com.sbuddy.app.data.repository.GroupRepository
 import com.sbuddy.app.ui.history.MatchHistoryActivity
 
-class GroupDetailActivity : AppCompatActivity() {
+class GroupDetailActivity : BaseActivity() {
 
     private val repository = GroupRepository()
     private lateinit var adapter: MemberAdapter
