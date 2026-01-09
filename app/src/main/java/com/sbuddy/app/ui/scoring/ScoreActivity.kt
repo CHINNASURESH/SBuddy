@@ -28,16 +28,28 @@ class ScoreActivity : BaseActivity() {
     private var team2Name = "Team 2"
     private var isSingles = false
 
-    private val repository = MatchRepository()
+    private lateinit var repository: MatchRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_score)
 
-        maxScore = intent.getIntExtra("MAX_SCORE", 21)
-        team1Name = intent.getStringExtra("TEAM_1_NAME") ?: "Team 1"
-        team2Name = intent.getStringExtra("TEAM_2_NAME") ?: "Team 2"
-        isSingles = intent.getBooleanExtra("IS_SINGLES", false)
+        repository = MatchRepository(applicationContext)
+
+        if (savedInstanceState != null) {
+            scoreP1 = savedInstanceState.getInt("SCORE_P1", 0)
+            scoreP2 = savedInstanceState.getInt("SCORE_P2", 0)
+            currentServer = savedInstanceState.getString("CURRENT_SERVER", "Team 1")
+            maxScore = savedInstanceState.getInt("MAX_SCORE", 21)
+            team1Name = savedInstanceState.getString("TEAM_1_NAME", "Team 1")
+            team2Name = savedInstanceState.getString("TEAM_2_NAME", "Team 2")
+            isSingles = savedInstanceState.getBoolean("IS_SINGLES", false)
+        } else {
+            maxScore = intent.getIntExtra("MAX_SCORE", 21)
+            team1Name = intent.getStringExtra("TEAM_1_NAME") ?: "Team 1"
+            team2Name = intent.getStringExtra("TEAM_2_NAME") ?: "Team 2"
+            isSingles = intent.getBooleanExtra("IS_SINGLES", false)
+        }
 
         val txtInfo = findViewById<TextView>(R.id.txt_match_info)
         val typeStr = if (isSingles) "Singles" else "Doubles"
@@ -154,6 +166,17 @@ class ScoreActivity : BaseActivity() {
         }
 
         updateUI()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt("SCORE_P1", scoreP1)
+        outState.putInt("SCORE_P2", scoreP2)
+        outState.putString("CURRENT_SERVER", currentServer)
+        outState.putInt("MAX_SCORE", maxScore)
+        outState.putString("TEAM_1_NAME", team1Name)
+        outState.putString("TEAM_2_NAME", team2Name)
+        outState.putBoolean("IS_SINGLES", isSingles)
     }
 
     private fun saveGame(winner: String) {
