@@ -19,13 +19,15 @@ import java.util.Locale
 
 class MatchHistoryActivity : BaseActivity() {
 
-    private val repository = MatchRepository()
+    private lateinit var repository: MatchRepository
     private var allMatches: List<Match> = emptyList()
     private var currentTab = 0 // 0 = Singles, 1 = Doubles
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_match_history)
+
+        repository = MatchRepository(applicationContext)
 
         val userName = intent.getStringExtra("USER_NAME")
         val recyclerView = findViewById<RecyclerView>(R.id.recycler_history)
