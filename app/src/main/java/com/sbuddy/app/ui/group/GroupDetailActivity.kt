@@ -30,7 +30,13 @@ class GroupDetailActivity : BaseActivity() {
         setContentView(R.layout.activity_group_detail)
 
         groupId = intent.getStringExtra("GROUP_ID") ?: return
-        val group = repository.getGroupById(groupId) ?: return
+        val group = repository.getGroupById(groupId)
+
+        if (group == null) {
+            Toast.makeText(this, "Group not found or error loading data", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
 
         findViewById<TextView>(R.id.txt_detail_group_name).text = group.name
         findViewById<TextView>(R.id.txt_detail_group_desc).text = group.description
@@ -78,6 +84,16 @@ class GroupDetailActivity : BaseActivity() {
                         adapter.updateList(updatedGroup.members)
                         Toast.makeText(this, "$name added to group!", Toast.LENGTH_SHORT).show()
                     }
+                }
+            }
+            .setNeutralButton("Share Link") { _, _ ->
+                val group = repository.getGroupById(groupId)
+                if (group != null) {
+                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, "Join my badminton group '${group.name}' on SBuddy!")
+                    }
+                    startActivity(Intent.createChooser(shareIntent, "Invite Friend via"))
                 }
             }
             .setNegativeButton("Cancel", null)

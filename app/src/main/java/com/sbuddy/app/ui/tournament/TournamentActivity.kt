@@ -2,10 +2,12 @@ package com.sbuddy.app.ui.tournament
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -34,6 +36,16 @@ class TournamentActivity : BaseActivity() {
         val inputTournamentName = findViewById<EditText>(R.id.input_tournament_name)
         val inputCategory = findViewById<EditText>(R.id.input_tournament_category)
         val checkPublic = findViewById<CheckBox>(R.id.check_public)
+        val spinnerType = findViewById<Spinner>(R.id.spinner_tournament_type)
+
+        // Setup Spinner
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_item,
+            listOf("Knockout", "Round Robin")
+        )
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerType.adapter = adapter
 
         btnAdd.setOnClickListener {
             val name = inputName.text.toString().trim()
@@ -64,7 +76,13 @@ class TournamentActivity : BaseActivity() {
                 return@setOnClickListener
             }
 
-            val bracketText = tournamentManager.generateBracketText(participants, topSeed)
+            val selectedType = spinnerType.selectedItem as String
+            val bracketText = if (selectedType == "Round Robin") {
+                tournamentManager.generateRoundRobinText(participants)
+            } else {
+                tournamentManager.generateBracketText(participants, topSeed)
+            }
+
             txtBracket.text = bracketText
             txtBracket.gravity = android.view.Gravity.START
 
