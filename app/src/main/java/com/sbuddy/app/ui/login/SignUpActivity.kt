@@ -16,6 +16,11 @@ class SignUpActivity : BaseActivity() {
         val inputEmail = findViewById<EditText>(R.id.signup_email)
         val inputPassword = findViewById<EditText>(R.id.signup_password)
         val btnSignUp = findViewById<Button>(R.id.btn_sign_up)
+        val btnGoogle = findViewById<Button>(R.id.btn_google_login)
+
+        btnGoogle.setOnClickListener {
+            Toast.makeText(this, "Google Login (Placeholder)", Toast.LENGTH_SHORT).show()
+        }
 
         btnSignUp.setOnClickListener {
             val email = inputEmail.text.toString()

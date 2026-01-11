@@ -194,23 +194,27 @@ class ScoreActivity : BaseActivity() {
     }
 
     private fun showGameOverDialog(winnerName: String, finalScore: String) {
-        val dialog = AlertDialog.Builder(this)
-            .setTitle("🏆 Game Over!")
-            .setMessage("$winnerName wins the game!\nFinal Score: $finalScore")
-            .setCancelable(false)
-            .setPositiveButton("New Game") { _, _ ->
-                finish()
-            }
-            .setNegativeButton("Rematch") { _, _ ->
-                scoreP1 = 0
-                scoreP2 = 0
-                currentServer = "Team 1"
-                val txtScoreP1 = findViewById<TextView>(R.id.score_p1)
-                val txtScoreP2 = findViewById<TextView>(R.id.score_p2)
-                txtScoreP1.text = "0"
-                txtScoreP2.text = "0"
-            }
-            .create()
-        dialog.show()
+        val overlay = findViewById<View>(R.id.overlay_game_over)
+        val txtWinner = findViewById<TextView>(R.id.txt_winner_name)
+        val btnNewGame = findViewById<Button>(R.id.btn_new_game)
+        val btnRematch = findViewById<Button>(R.id.btn_rematch)
+
+        txtWinner.text = "$winnerName wins!\nFinal Score: $finalScore"
+        overlay.visibility = View.VISIBLE
+
+        btnNewGame.setOnClickListener {
+            finish()
+        }
+
+        btnRematch.setOnClickListener {
+            scoreP1 = 0
+            scoreP2 = 0
+            currentServer = "Team 1"
+            val txtScoreP1 = findViewById<TextView>(R.id.score_p1)
+            val txtScoreP2 = findViewById<TextView>(R.id.score_p2)
+            txtScoreP1.text = "0"
+            txtScoreP2.text = "0"
+            overlay.visibility = View.GONE
+        }
     }
 }
