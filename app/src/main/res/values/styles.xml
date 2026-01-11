@@ -1,0 +1,31 @@
+<resources>
+    <style name="Theme.SBuddy" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">#9C27B0</item>
+        <item name="colorPrimaryDark">#7B1FA2</item>
+        <item name="colorAccent">#E1BEE7</item>
+    </style>
+
+    <style name="Theme.SBuddy.Blue" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">#2196F3</item>
+        <item name="colorPrimaryDark">#1976D2</item>
+        <item name="colorAccent">#BBDEFB</item>
+    </style>
+
+    <style name="Theme.SBuddy.Pink" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">#E91E63</item>
+        <item name="colorPrimaryDark">#C2185B</item>
+        <item name="colorAccent">#F8BBD0</item>
+    </style>
+
+    <style name="Theme.SBuddy.Green" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">#4CAF50</item>
+        <item name="colorPrimaryDark">#388E3C</item>
+        <item name="colorAccent">#C8E6C9</item>
+    </style>
+
+    <style name="Theme.SBuddy.Yellow" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">#FFEB3B</item>
+        <item name="colorPrimaryDark">#FBC02D</item>
+        <item name="colorAccent">#FFF9C4</item>
+    </style>
+</resources>
