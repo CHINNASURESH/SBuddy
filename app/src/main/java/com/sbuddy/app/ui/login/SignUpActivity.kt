@@ -14,6 +14,7 @@ class SignUpActivity : BaseActivity() {
         setContentView(R.layout.activity_sign_up)
 
         val inputEmail = findViewById<EditText>(R.id.signup_email)
+        val inputMobile = findViewById<EditText>(R.id.signup_mobile)
         val inputPassword = findViewById<EditText>(R.id.signup_password)
         val btnSignUp = findViewById<Button>(R.id.btn_sign_up)
         val btnGoogle = findViewById<Button>(R.id.btn_google_login)
@@ -24,9 +25,10 @@ class SignUpActivity : BaseActivity() {
 
         btnSignUp.setOnClickListener {
             val email = inputEmail.text.toString()
+            val mobile = inputMobile.text.toString()
             val pass = inputPassword.text.toString()
 
-            if (email.isNotEmpty() && pass.isNotEmpty()) {
+            if (email.isNotEmpty() && mobile.isNotEmpty() && pass.isNotEmpty()) {
                 Toast.makeText(this, "Sign Up Successful! Please Login.", Toast.LENGTH_SHORT).show()
                 finish()
             } else {

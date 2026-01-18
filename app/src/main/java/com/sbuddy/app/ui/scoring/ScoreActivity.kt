@@ -68,27 +68,78 @@ class ScoreActivity : BaseActivity() {
         val btnP2Add = findViewById<Button>(R.id.btn_p2_add)
         val btnP2Minus = findViewById<Button>(R.id.btn_p2_minus)
         val btnReset = findViewById<Button>(R.id.btn_reset)
+        val btnSwapNames = findViewById<android.widget.ImageButton>(R.id.btn_swap_names)
+        val btnSwapCourt = findViewById<android.widget.ImageButton>(R.id.btn_swap_court)
 
         fun updateUI() {
             txtScoreP1.text = scoreP1.toString()
             txtScoreP2.text = scoreP2.toString()
+            txtTeam1.text = team1Name
+            txtTeam2.text = team2Name
 
             val cardTeam1 = findViewById<CardView>(R.id.card_team1)
             val cardTeam2 = findViewById<CardView>(R.id.card_team2)
             val lblServingT1 = findViewById<TextView>(R.id.lbl_serving_t1)
             val lblServingT2 = findViewById<TextView>(R.id.lbl_serving_t2)
 
+            val indLeftT1 = findViewById<TextView>(R.id.indicator_serve_left_t1)
+            val indRightT1 = findViewById<TextView>(R.id.indicator_serve_right_t1)
+            val indLeftT2 = findViewById<TextView>(R.id.indicator_serve_left_t2)
+            val indRightT2 = findViewById<TextView>(R.id.indicator_serve_right_t2)
+
+            // Reset indicators
+            indLeftT1.visibility = View.INVISIBLE
+            indRightT1.visibility = View.INVISIBLE
+            indLeftT2.visibility = View.INVISIBLE
+            indRightT2.visibility = View.INVISIBLE
+
             if (currentServer == "Team 1") {
                 cardTeam1.setCardBackgroundColor(Color.parseColor("#E1BEE7"))
                 cardTeam2.setCardBackgroundColor(Color.WHITE)
                 lblServingT1.visibility = View.VISIBLE
                 lblServingT2.visibility = View.INVISIBLE
+
+                if (scoreP1 % 2 == 0) {
+                    indRightT1.visibility = View.VISIBLE
+                } else {
+                    indLeftT1.visibility = View.VISIBLE
+                }
             } else {
                 cardTeam1.setCardBackgroundColor(Color.WHITE)
                 cardTeam2.setCardBackgroundColor(Color.parseColor("#E1BEE7"))
                 lblServingT1.visibility = View.INVISIBLE
                 lblServingT2.visibility = View.VISIBLE
+
+                if (scoreP2 % 2 == 0) {
+                    indRightT2.visibility = View.VISIBLE
+                } else {
+                    indLeftT2.visibility = View.VISIBLE
+                }
             }
+        }
+
+        btnSwapNames.setOnClickListener {
+            val temp = team1Name
+            team1Name = team2Name
+            team2Name = temp
+            updateUI()
+        }
+
+        btnSwapCourt.setOnClickListener {
+            // Swap Names
+            val tempName = team1Name
+            team1Name = team2Name
+            team2Name = tempName
+
+            // Swap Scores
+            val tempScore = scoreP1
+            scoreP1 = scoreP2
+            scoreP2 = tempScore
+
+            // Swap Server Tracking
+            currentServer = if (currentServer == "Team 1") "Team 2" else "Team 1"
+
+            updateUI()
         }
 
         fun checkGameOver() {
