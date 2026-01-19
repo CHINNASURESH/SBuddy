@@ -348,9 +348,7 @@
         android:visibility="gone"
         android:elevation="10dp"
         android:gravity="center"
-        android:layout_position="absolute"
         android:layout_gravity="center">
-        <!-- Note: layout_position is not standard, using root relative layout attributes from include -->
 
         <androidx.cardview.widget.CardView
             android:layout_width="400dp"
