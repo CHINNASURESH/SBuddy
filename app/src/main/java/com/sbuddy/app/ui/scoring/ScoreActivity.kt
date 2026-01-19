@@ -141,6 +141,8 @@ class ScoreActivity : BaseActivity() {
         fun updateUI() {
             txtScoreP1.text = scoreP1.toString()
             txtScoreP2.text = scoreP2.toString()
+            txtTeam1.text = team1Name
+            txtTeam2.text = team2Name
 
             if (!isSingles) {
                 txtT1Left.text = t1LeftName
@@ -231,6 +233,30 @@ class ScoreActivity : BaseActivity() {
                 team2Name = state.team2Name
                 updateUI()
             }
+        }
+
+        btnSwapNames.setOnClickListener {
+            val temp = team1Name
+            team1Name = team2Name
+            team2Name = temp
+            updateUI()
+        }
+
+        btnSwapCourt.setOnClickListener {
+            // Swap Names
+            val tempName = team1Name
+            team1Name = team2Name
+            team2Name = tempName
+
+            // Swap Scores
+            val tempScore = scoreP1
+            scoreP1 = scoreP2
+            scoreP2 = tempScore
+
+            // Swap Server Tracking
+            currentServer = if (currentServer == "Team 1") "Team 2" else "Team 1"
+
+            updateUI()
         }
 
         fun checkGameOver() {
