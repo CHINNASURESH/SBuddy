@@ -91,6 +91,21 @@ class MatchHistoryAdapter(private var matches: List<Match>) : RecyclerView.Adapt
 
         val sdf = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
         holder.date.text = sdf.format(Date(match.timestamp))
+
+        // Reset styles
+        holder.team1.setTypeface(null, android.graphics.Typeface.NORMAL)
+        holder.team1.setTextColor(android.graphics.Color.parseColor("#333333"))
+        holder.team2.setTypeface(null, android.graphics.Typeface.NORMAL)
+        holder.team2.setTextColor(android.graphics.Color.parseColor("#333333"))
+
+        // Highlight winner
+        if (match.winner == match.player1Name) {
+            holder.team1.setTypeface(null, android.graphics.Typeface.BOLD)
+            holder.team1.setTextColor(android.graphics.Color.parseColor("#A06CD5"))
+        } else if (match.winner == match.player2Name) {
+            holder.team2.setTypeface(null, android.graphics.Typeface.BOLD)
+            holder.team2.setTextColor(android.graphics.Color.parseColor("#A06CD5"))
+        }
     }
 
     override fun getItemCount() = matches.size
