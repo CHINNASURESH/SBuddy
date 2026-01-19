@@ -141,6 +141,38 @@ class ScoreActivity : BaseActivity() {
         fun updateUI() {
             txtScoreP1.text = scoreP1.toString()
             txtScoreP2.text = scoreP2.toString()
+            txtTeam1.text = team1Name
+            txtTeam2.text = team2Name
+
+            if (!isSingles) {
+                txtT1Left.text = t1LeftName
+                txtT1Right.text = t1RightName
+                txtT2Left.text = t2LeftName
+                txtT2Right.text = t2RightName
+
+                // Clear drawables
+                txtT1Left.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+                txtT1Right.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+                txtT2Left.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+                txtT2Right.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+
+                if (currentServer == "Team 1") {
+                   if (scoreP1 % 2 == 0) {
+                       txtT1Right.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_shuttlecock, 0)
+                   } else {
+                       txtT1Left.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_shuttlecock, 0)
+                   }
+                } else {
+                   if (scoreP2 % 2 == 0) {
+                       txtT2Right.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_shuttlecock, 0)
+                   } else {
+                       txtT2Left.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_shuttlecock, 0)
+                   }
+                }
+            } else {
+                 txtTeam1.text = team1Name
+                 txtTeam2.text = team2Name
+            }
 
             if (!isSingles) {
                 txtT1Left.text = t1LeftName
@@ -231,6 +263,30 @@ class ScoreActivity : BaseActivity() {
                 team2Name = state.team2Name
                 updateUI()
             }
+        }
+
+        btnSwapNames.setOnClickListener {
+            val temp = team1Name
+            team1Name = team2Name
+            team2Name = temp
+            updateUI()
+        }
+
+        btnSwapCourt.setOnClickListener {
+            // Swap Names
+            val tempName = team1Name
+            team1Name = team2Name
+            team2Name = tempName
+
+            // Swap Scores
+            val tempScore = scoreP1
+            scoreP1 = scoreP2
+            scoreP2 = tempScore
+
+            // Swap Server Tracking
+            currentServer = if (currentServer == "Team 1") "Team 2" else "Team 1"
+
+            updateUI()
         }
 
         fun checkGameOver() {
