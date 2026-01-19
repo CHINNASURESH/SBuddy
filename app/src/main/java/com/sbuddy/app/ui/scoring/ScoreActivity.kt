@@ -43,6 +43,26 @@ class ScoreActivity : BaseActivity() {
 
     private lateinit var repository: MatchRepository
 
+    // UI Components
+    private lateinit var txtScoreP1: TextView
+    private lateinit var txtScoreP2: TextView
+    private lateinit var txtTeam1: TextView
+    private lateinit var txtTeam2: TextView
+    private lateinit var layoutTeam1Names: LinearLayout
+    private lateinit var layoutTeam2Names: LinearLayout
+    private lateinit var txtT1Left: TextView
+    private lateinit var txtT1Right: TextView
+    private lateinit var txtT2Left: TextView
+    private lateinit var txtT2Right: TextView
+    private lateinit var cardTeam1: CardView
+    private lateinit var cardTeam2: CardView
+    private lateinit var lblServingT1: TextView
+    private lateinit var lblServingT2: TextView
+    private lateinit var indLeftT1: TextView
+    private lateinit var indRightT1: TextView
+    private lateinit var indLeftT2: TextView
+    private lateinit var indRightT2: TextView
+
     // History stack for Undo
     private data class GameState(
         val scoreP1: Int,
@@ -99,14 +119,20 @@ class ScoreActivity : BaseActivity() {
             t2LeftName = p4Name
         }
 
+        initializeViews()
+        setupListeners()
+        updateUI()
+    }
+
+    private fun initializeViews() {
         val txtInfo = findViewById<TextView>(R.id.txt_match_info)
         val typeStr = if (isSingles) "Singles" else "Doubles"
         txtInfo.text = "$typeStr Match • First to $maxScore"
 
-        val txtTeam1 = findViewById<TextView>(R.id.txt_team1_name)
-        val txtTeam2 = findViewById<TextView>(R.id.txt_team2_name)
-        val layoutTeam1Names = findViewById<LinearLayout>(R.id.layout_team1_names)
-        val layoutTeam2Names = findViewById<LinearLayout>(R.id.layout_team2_names)
+        txtTeam1 = findViewById(R.id.txt_team1_name)
+        txtTeam2 = findViewById(R.id.txt_team2_name)
+        layoutTeam1Names = findViewById(R.id.layout_team1_names)
+        layoutTeam2Names = findViewById(R.id.layout_team2_names)
 
         if (isSingles) {
             layoutTeam1Names.visibility = View.GONE
@@ -122,9 +148,26 @@ class ScoreActivity : BaseActivity() {
             txtTeam2.visibility = View.GONE
         }
 
-        val txtScoreP1 = findViewById<TextView>(R.id.score_p1)
-        val txtScoreP2 = findViewById<TextView>(R.id.score_p2)
+        txtScoreP1 = findViewById(R.id.score_p1)
+        txtScoreP2 = findViewById(R.id.score_p2)
 
+        txtT1Left = findViewById(R.id.txt_t1_left)
+        txtT1Right = findViewById(R.id.txt_t1_right)
+        txtT2Left = findViewById(R.id.txt_t2_left)
+        txtT2Right = findViewById(R.id.txt_t2_right)
+
+        cardTeam1 = findViewById(R.id.card_team1)
+        cardTeam2 = findViewById(R.id.card_team2)
+        lblServingT1 = findViewById(R.id.lbl_serving_t1)
+        lblServingT2 = findViewById(R.id.lbl_serving_t2)
+
+        indLeftT1 = findViewById(R.id.indicator_serve_left_t1)
+        indRightT1 = findViewById(R.id.indicator_serve_right_t1)
+        indLeftT2 = findViewById(R.id.indicator_serve_left_t2)
+        indRightT2 = findViewById(R.id.indicator_serve_right_t2)
+    }
+
+    private fun setupListeners() {
         val btnP1Add = findViewById<Button>(R.id.btn_p1_add)
         val btnP1Minus = findViewById<Button>(R.id.btn_p1_minus)
         val btnP2Add = findViewById<Button>(R.id.btn_p2_add)
@@ -132,198 +175,6 @@ class ScoreActivity : BaseActivity() {
         val btnReset = findViewById<Button>(R.id.btn_reset)
         val btnSwapNames = findViewById<android.widget.ImageButton>(R.id.btn_swap_names)
         val btnSwapCourt = findViewById<android.widget.ImageButton>(R.id.btn_swap_court)
-
-        val txtT1Left = findViewById<TextView>(R.id.txt_t1_left)
-        val txtT1Right = findViewById<TextView>(R.id.txt_t1_right)
-        val txtT2Left = findViewById<TextView>(R.id.txt_t2_left)
-        val txtT2Right = findViewById<TextView>(R.id.txt_t2_right)
-
-        fun updateUI() {
-            txtScoreP1.text = scoreP1.toString()
-            txtScoreP2.text = scoreP2.toString()
-            txtTeam1.text = team1Name
-            txtTeam2.text = team2Name
-
-            if (!isSingles) {
-                txtT1Left.text = t1LeftName
-                txtT1Right.text = t1RightName
-                txtT2Left.text = t2LeftName
-                txtT2Right.text = t2RightName
-
-                // Clear drawables
-                txtT1Left.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
-                txtT1Right.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
-                txtT2Left.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
-                txtT2Right.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
-
-                if (currentServer == "Team 1") {
-                   if (scoreP1 % 2 == 0) {
-                       txtT1Right.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_shuttlecock, 0)
-                   } else {
-                       txtT1Left.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_shuttlecock, 0)
-                   }
-                } else {
-                   if (scoreP2 % 2 == 0) {
-                       txtT2Right.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_shuttlecock, 0)
-                   } else {
-                       txtT2Left.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_shuttlecock, 0)
-                   }
-                }
-            } else {
-                 txtTeam1.text = team1Name
-                 txtTeam2.text = team2Name
-            }
-
-            if (!isSingles) {
-                txtT1Left.text = t1LeftName
-                txtT1Right.text = t1RightName
-                txtT2Left.text = t2LeftName
-                txtT2Right.text = t2RightName
-
-                // Clear drawables
-                txtT1Left.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
-                txtT1Right.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
-                txtT2Left.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
-                txtT2Right.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
-
-                if (currentServer == "Team 1") {
-                   if (scoreP1 % 2 == 0) {
-                       txtT1Right.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_shuttlecock, 0)
-                   } else {
-                       txtT1Left.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_shuttlecock, 0)
-                   }
-                } else {
-                   if (scoreP2 % 2 == 0) {
-                       txtT2Right.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_shuttlecock, 0)
-                   } else {
-                       txtT2Left.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_shuttlecock, 0)
-                   }
-                }
-            } else {
-                 txtTeam1.text = team1Name
-                 txtTeam2.text = team2Name
-            }
-
-            val cardTeam1 = findViewById<CardView>(R.id.card_team1)
-            val cardTeam2 = findViewById<CardView>(R.id.card_team2)
-            val lblServingT1 = findViewById<TextView>(R.id.lbl_serving_t1)
-            val lblServingT2 = findViewById<TextView>(R.id.lbl_serving_t2)
-
-            val indLeftT1 = findViewById<TextView>(R.id.indicator_serve_left_t1)
-            val indRightT1 = findViewById<TextView>(R.id.indicator_serve_right_t1)
-            val indLeftT2 = findViewById<TextView>(R.id.indicator_serve_left_t2)
-            val indRightT2 = findViewById<TextView>(R.id.indicator_serve_right_t2)
-
-            // Reset indicators
-            indLeftT1.visibility = View.INVISIBLE
-            indRightT1.visibility = View.INVISIBLE
-            indLeftT2.visibility = View.INVISIBLE
-            indRightT2.visibility = View.INVISIBLE
-
-            if (currentServer == "Team 1") {
-                cardTeam1.setCardBackgroundColor(Color.parseColor("#E1BEE7"))
-                cardTeam2.setCardBackgroundColor(Color.WHITE)
-                lblServingT1.visibility = View.VISIBLE
-                lblServingT2.visibility = View.INVISIBLE
-
-                if (scoreP1 % 2 == 0) {
-                    indRightT1.visibility = View.VISIBLE
-                } else {
-                    indLeftT1.visibility = View.VISIBLE
-                }
-            } else {
-                cardTeam1.setCardBackgroundColor(Color.WHITE)
-                cardTeam2.setCardBackgroundColor(Color.parseColor("#E1BEE7"))
-                lblServingT1.visibility = View.INVISIBLE
-                lblServingT2.visibility = View.VISIBLE
-
-                if (scoreP2 % 2 == 0) {
-                    indRightT2.visibility = View.VISIBLE
-                } else {
-                    indLeftT2.visibility = View.VISIBLE
-                }
-            }
-        }
-
-        fun saveState() {
-            history.push(GameState(scoreP1, scoreP2, currentServer, t1LeftName, t1RightName, t2LeftName, t2RightName, team1Name, team2Name))
-        }
-
-        fun restoreState() {
-            if (history.isNotEmpty()) {
-                val state = history.pop()
-                scoreP1 = state.scoreP1
-                scoreP2 = state.scoreP2
-                currentServer = state.currentServer
-                t1LeftName = state.t1Left
-                t1RightName = state.t1Right
-                t2LeftName = state.t2Left
-                t2RightName = state.t2Right
-                team1Name = state.team1Name
-                team2Name = state.team2Name
-                updateUI()
-            }
-        }
-
-        btnSwapNames.setOnClickListener {
-            val temp = team1Name
-            team1Name = team2Name
-            team2Name = temp
-            updateUI()
-        }
-
-        btnSwapCourt.setOnClickListener {
-            // Swap Names
-            val tempName = team1Name
-            team1Name = team2Name
-            team2Name = tempName
-
-            // Swap Scores
-            val tempScore = scoreP1
-            scoreP1 = scoreP2
-            scoreP2 = tempScore
-
-            // Swap Server Tracking
-            currentServer = if (currentServer == "Team 1") "Team 2" else "Team 1"
-
-            updateUI()
-        }
-
-        fun checkGameOver() {
-            var gameOver = false
-            var winner = ""
-
-            if (maxScore == 30) {
-                if (scoreP1 >= 30) {
-                    gameOver = true
-                    winner = team1Name
-                } else if (scoreP2 >= 30) {
-                    gameOver = true
-                    winner = team2Name
-                }
-            } else {
-                if (scoreP1 >= maxScore && (scoreP1 - scoreP2) >= 2) {
-                    gameOver = true
-                    winner = team1Name
-                } else if (scoreP2 >= maxScore && (scoreP2 - scoreP1) >= 2) {
-                    gameOver = true
-                    winner = team2Name
-                } else if (scoreP1 >= 30 || scoreP2 >= 30) {
-                     if (scoreP1 > scoreP2) {
-                         gameOver = true
-                         winner = team1Name
-                     } else {
-                         gameOver = true
-                         winner = team2Name
-                     }
-                }
-            }
-
-            if (gameOver) {
-                saveGame(winner)
-                showGameOverDialog(winner, "$scoreP1 - $scoreP2")
-            }
-        }
 
         btnP1Add.setOnClickListener {
             saveState()
@@ -371,8 +222,6 @@ class ScoreActivity : BaseActivity() {
 
         btnSwapNames.setOnClickListener {
             saveState()
-            // Swap Team Names (Team 1 becomes Team 2's name)
-            // But usually this means Team 1 was entered as Team 2.
             val tempName = team1Name
             team1Name = team2Name
             team2Name = tempName
@@ -381,7 +230,6 @@ class ScoreActivity : BaseActivity() {
 
         btnSwapCourt.setOnClickListener {
             saveState()
-            // Swap Names / Teams
             val tempT1Name = team1Name
             team1Name = team2Name
             team2Name = tempT1Name
@@ -395,12 +243,10 @@ class ScoreActivity : BaseActivity() {
                 t2RightName = tempR
             }
 
-            // Swap Scores
             val tempScore = scoreP1
             scoreP1 = scoreP2
             scoreP2 = tempScore
 
-            // Swap Server Tracking
             currentServer = if (currentServer == "Team 1") "Team 2" else "Team 1"
 
             updateUI()
@@ -412,7 +258,6 @@ class ScoreActivity : BaseActivity() {
             currentServer = "Team 1"
             history.clear()
             if (!isSingles) {
-                 // Reset positions
                 t1RightName = p1Name
                 t1LeftName = p2Name
                 t2RightName = p3Name
@@ -421,7 +266,6 @@ class ScoreActivity : BaseActivity() {
             updateUI()
         }
 
-        // Manual Server Change Click Listeners
         if (!isSingles) {
             val listener = View.OnClickListener { v ->
                 saveState()
@@ -466,7 +310,6 @@ class ScoreActivity : BaseActivity() {
             txtT2Left.setOnClickListener(listener)
             txtT2Right.setOnClickListener(listener)
 
-            // Swap positions on long click (per team)
             layoutTeam1Names.setOnLongClickListener {
                 saveState()
                 val temp = t1LeftName
@@ -485,8 +328,125 @@ class ScoreActivity : BaseActivity() {
                 true
             }
         }
+    }
 
-        updateUI()
+    private fun updateUI() {
+        txtScoreP1.text = scoreP1.toString()
+        txtScoreP2.text = scoreP2.toString()
+
+        if (!isSingles) {
+            txtT1Left.text = t1LeftName
+            txtT1Right.text = t1RightName
+            txtT2Left.text = t2LeftName
+            txtT2Right.text = t2RightName
+
+            txtT1Left.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+            txtT1Right.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+            txtT2Left.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+            txtT2Right.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+
+            if (currentServer == "Team 1") {
+                if (scoreP1 % 2 == 0) {
+                    txtT1Right.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_shuttlecock, 0)
+                } else {
+                    txtT1Left.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_shuttlecock, 0)
+                }
+            } else {
+                if (scoreP2 % 2 == 0) {
+                    txtT2Right.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_shuttlecock, 0)
+                } else {
+                    txtT2Left.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_shuttlecock, 0)
+                }
+            }
+        } else {
+                txtTeam1.text = team1Name
+                txtTeam2.text = team2Name
+        }
+
+        indLeftT1.visibility = View.INVISIBLE
+        indRightT1.visibility = View.INVISIBLE
+        indLeftT2.visibility = View.INVISIBLE
+        indRightT2.visibility = View.INVISIBLE
+
+        if (currentServer == "Team 1") {
+            cardTeam1.setCardBackgroundColor(Color.parseColor("#E1BEE7"))
+            cardTeam2.setCardBackgroundColor(Color.WHITE)
+            lblServingT1.visibility = View.VISIBLE
+            lblServingT2.visibility = View.INVISIBLE
+
+            if (scoreP1 % 2 == 0) {
+                indRightT1.visibility = View.VISIBLE
+            } else {
+                indLeftT1.visibility = View.VISIBLE
+            }
+        } else {
+            cardTeam1.setCardBackgroundColor(Color.WHITE)
+            cardTeam2.setCardBackgroundColor(Color.parseColor("#E1BEE7"))
+            lblServingT1.visibility = View.INVISIBLE
+            lblServingT2.visibility = View.VISIBLE
+
+            if (scoreP2 % 2 == 0) {
+                indRightT2.visibility = View.VISIBLE
+            } else {
+                indLeftT2.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    private fun saveState() {
+        history.push(GameState(scoreP1, scoreP2, currentServer, t1LeftName, t1RightName, t2LeftName, t2RightName, team1Name, team2Name))
+    }
+
+    private fun restoreState() {
+        if (history.isNotEmpty()) {
+            val state = history.pop()
+            scoreP1 = state.scoreP1
+            scoreP2 = state.scoreP2
+            currentServer = state.currentServer
+            t1LeftName = state.t1Left
+            t1RightName = state.t1Right
+            t2LeftName = state.t2Left
+            t2RightName = state.t2Right
+            team1Name = state.team1Name
+            team2Name = state.team2Name
+            updateUI()
+        }
+    }
+
+    private fun checkGameOver() {
+        var gameOver = false
+        var winner = ""
+
+        if (maxScore == 30) {
+            if (scoreP1 >= 30) {
+                gameOver = true
+                winner = team1Name
+            } else if (scoreP2 >= 30) {
+                gameOver = true
+                winner = team2Name
+            }
+        } else {
+            if (scoreP1 >= maxScore && (scoreP1 - scoreP2) >= 2) {
+                gameOver = true
+                winner = team1Name
+            } else if (scoreP2 >= maxScore && (scoreP2 - scoreP1) >= 2) {
+                gameOver = true
+                winner = team2Name
+            } else if (scoreP1 >= 30 || scoreP2 >= 30) {
+                    if (scoreP1 > scoreP2) {
+                        gameOver = true
+                        winner = team1Name
+                    } else {
+                        gameOver = true
+                        winner = team2Name
+                    }
+            }
+        }
+
+        if (gameOver) {
+            saveGame(winner)
+            showGameOverDialog(winner, "$scoreP1 - $scoreP2")
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -551,7 +511,7 @@ class ScoreActivity : BaseActivity() {
                 t2LeftName = p4Name
             }
             overlay.visibility = View.GONE
-            updateUI() // ensure UI updates after reset
+            updateUI()
         }
     }
 }
