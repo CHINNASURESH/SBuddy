@@ -83,6 +83,10 @@ class MatchSetupActivity : BaseActivity() {
                 putExtra("TEAM_1_NAME", team1Name)
                 putExtra("TEAM_2_NAME", team2Name)
                 putExtra("IS_SINGLES", isSingles)
+                putExtra("PLAYER_1_NAME", p1Name)
+                putExtra("PLAYER_2_NAME", p2Name)
+                putExtra("PLAYER_3_NAME", p3Name)
+                putExtra("PLAYER_4_NAME", p4Name)
             }
             startActivity(intent)
             finish()

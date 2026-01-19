@@ -73,6 +73,37 @@
                     android:layout_centerHorizontal="true"
                     android:visibility="invisible"/>
 
+                <LinearLayout
+                    android:id="@+id/layout_team1_names"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="8dp">
+
+                    <TextView
+                        android:id="@+id/txt_t1_left"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Player 2"
+                        android:gravity="center"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:padding="8dp"/>
+
+                    <TextView
+                        android:id="@+id/txt_t1_right"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Player 1"
+                        android:gravity="center"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:padding="8dp"/>
+                </LinearLayout>
+
                 <TextView
                     android:id="@+id/txt_team1_name"
                     android:layout_width="match_parent"
@@ -81,7 +112,8 @@
                     android:textAlignment="center"
                     android:textSize="24sp"
                     android:textStyle="bold"
-                    android:layout_marginTop="8dp"/>
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone"/>
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -209,6 +241,37 @@
                     android:layout_centerHorizontal="true"
                     android:visibility="invisible"/>
 
+                <LinearLayout
+                    android:id="@+id/layout_team2_names"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="8dp">
+
+                    <TextView
+                        android:id="@+id/txt_t2_left"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Player 4"
+                        android:gravity="center"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:padding="8dp"/>
+
+                    <TextView
+                        android:id="@+id/txt_t2_right"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Player 3"
+                        android:gravity="center"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:padding="8dp"/>
+                </LinearLayout>
+
                 <TextView
                     android:id="@+id/txt_team2_name"
                     android:layout_width="match_parent"
@@ -217,7 +280,8 @@
                     android:textAlignment="center"
                     android:textSize="24sp"
                     android:textStyle="bold"
-                    android:layout_marginTop="8dp"/>
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone"/>
 
                 <LinearLayout
                     android:layout_width="wrap_content"
