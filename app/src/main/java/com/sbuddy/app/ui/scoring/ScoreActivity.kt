@@ -174,6 +174,36 @@ class ScoreActivity : BaseActivity() {
                  txtTeam2.text = team2Name
             }
 
+            if (!isSingles) {
+                txtT1Left.text = t1LeftName
+                txtT1Right.text = t1RightName
+                txtT2Left.text = t2LeftName
+                txtT2Right.text = t2RightName
+
+                // Clear drawables
+                txtT1Left.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+                txtT1Right.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+                txtT2Left.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+                txtT2Right.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+
+                if (currentServer == "Team 1") {
+                   if (scoreP1 % 2 == 0) {
+                       txtT1Right.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_shuttlecock, 0)
+                   } else {
+                       txtT1Left.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_shuttlecock, 0)
+                   }
+                } else {
+                   if (scoreP2 % 2 == 0) {
+                       txtT2Right.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_shuttlecock, 0)
+                   } else {
+                       txtT2Left.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_shuttlecock, 0)
+                   }
+                }
+            } else {
+                 txtTeam1.text = team1Name
+                 txtTeam2.text = team2Name
+            }
+
             val cardTeam1 = findViewById<CardView>(R.id.card_team1)
             val cardTeam2 = findViewById<CardView>(R.id.card_team2)
             val lblServingT1 = findViewById<TextView>(R.id.lbl_serving_t1)
