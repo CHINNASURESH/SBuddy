@@ -56,23 +56,32 @@ class BuddyGroupActivity : BaseActivity() {
         val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_create_group, null)
         val inputName = dialogView.findViewById<EditText>(R.id.input_group_name)
         val inputDesc = dialogView.findViewById<EditText>(R.id.input_group_desc)
+        val btnCreate = dialogView.findViewById<Button>(R.id.btn_create)
+        val btnCancel = dialogView.findViewById<Button>(R.id.btn_cancel)
 
-        AlertDialog.Builder(this)
-            .setTitle("Create New Group")
+        val dialog = AlertDialog.Builder(this)
             .setView(dialogView)
-            .setPositiveButton("Create") { _, _ ->
-                val name = inputName.text.toString().trim()
-                val desc = inputDesc.text.toString().trim()
-                if (name.isNotEmpty()) {
-                    repository.createGroup(name, desc)
-                    adapter.updateList(repository.getGroups())
-                    Toast.makeText(this, "Group '$name' created!", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, "Name cannot be empty", Toast.LENGTH_SHORT).show()
-                }
+            .setCancelable(true)
+            .create()
+
+        btnCreate.setOnClickListener {
+            val name = inputName.text.toString().trim()
+            val desc = inputDesc.text.toString().trim()
+            if (name.isNotEmpty()) {
+                repository.createGroup(name, desc)
+                adapter.updateList(repository.getGroups())
+                Toast.makeText(this, "Group '$name' created!", Toast.LENGTH_SHORT).show()
+                dialog.dismiss()
+            } else {
+                Toast.makeText(this, "Name cannot be empty", Toast.LENGTH_SHORT).show()
             }
-            .setNegativeButton("Cancel", null)
-            .show()
+        }
+
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 }
 

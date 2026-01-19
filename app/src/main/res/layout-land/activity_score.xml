@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:background="#F5F5F5"
+    android:padding="8dp"
+    android:baselineAligned="false">
+
+    <!-- Top Tile (Team 1) - Left Side -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_team1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_marginEnd="4dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/indicator_serve_left_t1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="L"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="#A06CD5"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true"
+                android:visibility="invisible"/>
+
+            <TextView
+                android:id="@+id/indicator_serve_right_t1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="R"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="#A06CD5"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:visibility="invisible"/>
+
+            <TextView
+                android:id="@+id/lbl_serving_t1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SERVING"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:visibility="invisible"/>
+
+            <LinearLayout
+                android:id="@+id/layout_team1_names"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:id="@+id/txt_t1_left"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Player 2"
+                    android:gravity="center"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:padding="8dp"/>
+
+                <TextView
+                    android:id="@+id/txt_t1_right"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Player 1"
+                    android:gravity="center"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:padding="8dp"/>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/txt_team1_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Player 1 &amp; Player 2"
+                android:textAlignment="center"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:layout_marginTop="8dp"
+                android:visibility="gone"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/score_p1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="80sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000"
+                    android:includeFontPadding="false"/>
+            </LinearLayout>
+
+            <!-- Controls at bottom of tile -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_alignParentBottom="true">
+
+                <Button
+                    android:id="@+id/btn_p1_minus"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:text="-"
+                    android:textSize="20sp"
+                    android:backgroundTint="#E0E0E0"
+                    android:textColor="#000000"
+                    android:layout_marginEnd="16dp"/>
+
+                <Button
+                    android:id="@+id/btn_p1_add"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:text="+"
+                    android:textSize="20sp"
+                    android:backgroundTint="#9C27B0"
+                    android:textColor="#FFFFFF"/>
+            </LinearLayout>
+
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Center Controls -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/txt_match_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="To 21"
+            android:textSize="12sp"
+            android:textColor="#757575"
+            android:layout_marginBottom="16dp"/>
+
+        <ImageButton
+            android:id="@+id/btn_swap_names"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_swap_horiz"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:tint="#757575"
+            android:contentDescription="Swap Names"
+            android:layout_marginBottom="24dp"/>
+
+        <ImageButton
+            android:id="@+id/btn_swap_court"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_swap_vert"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:tint="#757575"
+            android:rotation="90"
+            android:contentDescription="Swap Courts"
+            android:layout_marginBottom="24dp"/>
+
+        <Button
+            android:id="@+id/btn_reset"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reset"
+            android:textColor="#757575"/>
+
+    </LinearLayout>
+
+    <!-- Bottom Tile (Team 2) - Right Side -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_team2"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_marginStart="4dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/indicator_serve_left_t2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="L"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="#A06CD5"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true"
+                android:visibility="invisible"/>
+
+            <TextView
+                android:id="@+id/indicator_serve_right_t2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="R"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="#A06CD5"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:visibility="invisible"/>
+
+            <TextView
+                android:id="@+id/lbl_serving_t2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SERVING"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:visibility="invisible"/>
+
+            <LinearLayout
+                android:id="@+id/layout_team2_names"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:id="@+id/txt_t2_left"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Player 4"
+                    android:gravity="center"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:padding="8dp"/>
+
+                <TextView
+                    android:id="@+id/txt_t2_right"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Player 3"
+                    android:gravity="center"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:padding="8dp"/>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/txt_team2_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Player 3 &amp; Player 4"
+                android:textAlignment="center"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:layout_marginTop="8dp"
+                android:visibility="gone"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/score_p2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="80sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000"
+                    android:includeFontPadding="false"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_alignParentBottom="true">
+
+                <Button
+                    android:id="@+id/btn_p2_minus"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:text="-"
+                    android:textSize="20sp"
+                    android:backgroundTint="#E0E0E0"
+                    android:textColor="#000000"
+                    android:layout_marginEnd="16dp"/>
+
+                <Button
+                    android:id="@+id/btn_p2_add"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:text="+"
+                    android:textSize="20sp"
+                    android:backgroundTint="#9C27B0"
+                    android:textColor="#FFFFFF"/>
+            </LinearLayout>
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Game Over Overlay (Keep it simple for now, might need adjustment for landscape but basic RelativeLayout works) -->
+    <RelativeLayout
+        android:id="@+id/overlay_game_over"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#CC000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone"
+        android:elevation="10dp"
+        android:gravity="center"
+        android:layout_position="absolute"
+        android:layout_gravity="center">
+        <!-- Note: layout_position is not standard, using root relative layout attributes from include -->
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardBackgroundColor="#FFFFFF"
+            android:layout_centerInParent="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@android:drawable/btn_star_big_on"
+                    android:tint="#FFD700"
+                    android:layout_marginBottom="16dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="GAME OVER"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:textColor="#333333"
+                    android:layout_marginBottom="8dp"/>
+
+                <TextView
+                    android:id="@+id/txt_winner_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Team 1 Wins!"
+                    android:textSize="18sp"
+                    android:textColor="#555555"
+                    android:textAlignment="center"
+                    android:layout_marginBottom="24dp"/>
+
+                <Button
+                    android:id="@+id/btn_new_game"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="New Game"
+                    android:backgroundTint="#9C27B0"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginBottom="8dp"/>
+
+                <Button
+                    android:id="@+id/btn_rematch"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Rematch"
+                    android:textColor="#9C27B0"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </RelativeLayout>
+
+</LinearLayout>

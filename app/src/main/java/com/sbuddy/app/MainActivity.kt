@@ -50,6 +50,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             startActivity(Intent(this, TournamentActivity::class.java))
         }
 
+        findViewById<android.view.View>(R.id.card_buddy_groups).setOnClickListener {
+            startActivity(Intent(this, BuddyGroupActivity::class.java))
+        }
+
         // Mock profile icon click (Top right icon in dashboard xml)
         // Since we don't have a direct ID for it in the previous xml or it was just an imageview,
         // let's assume it's part of the toolbar or a specific view.
@@ -85,6 +89,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             }
             R.id.nav_buddy_groups -> {
                 startActivity(Intent(this, BuddyGroupActivity::class.java))
+            }
+            R.id.nav_profile -> {
+                startActivity(Intent(this, UserProfileActivity::class.java))
             }
         }
         drawerLayout.closeDrawer(GravityCompat.START)

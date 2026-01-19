@@ -514,4 +514,13 @@ class ScoreActivity : BaseActivity() {
             updateUI()
         }
     }
+
+    override fun onBackPressed() {
+        AlertDialog.Builder(this)
+            .setTitle("Exit Match?")
+            .setMessage("Current progress will be lost. Are you sure?")
+            .setPositiveButton("Yes") { _, _ -> super.onBackPressed() }
+            .setNegativeButton("No", null)
+            .show()
+    }
 }
