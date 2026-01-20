@@ -21,7 +21,7 @@ class MatchHistoryActivity : BaseActivity() {
 
     private lateinit var repository: MatchRepository
     private var allMatches: List<Match> = emptyList()
-    private var currentTab = 0 // 0 = Singles, 1 = Doubles
+    private var currentTab = 0 // 0 = All, 1 = Singles, 2 = Doubles
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,10 +60,11 @@ class MatchHistoryActivity : BaseActivity() {
     }
 
     private fun updateList(adapter: MatchHistoryAdapter) {
-        val filtered = if (currentTab == 0) {
-            allMatches.filter { it.isSingles }
-        } else {
-            allMatches.filter { !it.isSingles }
+        val filtered = when (currentTab) {
+            0 -> allMatches
+            1 -> allMatches.filter { it.isSingles }
+            2 -> allMatches.filter { !it.isSingles }
+            else -> allMatches
         }
         adapter.updateList(filtered)
     }
