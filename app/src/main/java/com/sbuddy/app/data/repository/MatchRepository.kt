@@ -1,12 +1,15 @@
 package com.sbuddy.app.data.repository
 
 import android.content.Context
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.sbuddy.app.data.model.Match
 
 class MatchRepository(private val context: Context) {
 
+    private val db: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
     private val PREFS_NAME = "sbuddy_prefs"
     private val KEY_MATCH_HISTORY = "match_history"
     private val gson = Gson()
@@ -55,9 +58,21 @@ class MatchRepository(private val context: Context) {
     fun saveMatch(match: Match) {
         matches.add(0, match) // Add to top
         saveMatches()
+
+        db.collection("matches").add(match)
     }
 
     fun getHistory(callback: (List<Match>) -> Unit) {
-        callback(matches)
+        db.collection("matches")
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .get()
+            .addOnSuccessListener { result ->
+                val matchList = result.toObjects(Match::class.java)
+                callback(matchList)
+            }
+            .addOnFailureListener {
+                // Fallback to local history
+                callback(matches)
+            }
     }
 }
