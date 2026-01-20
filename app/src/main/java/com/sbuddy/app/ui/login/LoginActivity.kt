@@ -3,11 +3,12 @@ package com.sbuddy.app.ui.login
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.sbuddy.app.BaseActivity
 import com.sbuddy.app.MainActivity
 import com.sbuddy.app.data.repository.AuthRepository
 import com.sbuddy.app.databinding.ActivityLoginBinding
+import kotlinx.coroutines.launch
 
 class LoginActivity : BaseActivity() {
 
@@ -20,15 +21,24 @@ class LoginActivity : BaseActivity() {
         setContentView(binding.root)
 
         binding.login.setOnClickListener {
-            val username = binding.username.text.toString()
+            val email = binding.username.text.toString()
             val password = binding.password.text.toString()
 
-            if (username.isNotEmpty() && password.isNotEmpty()) {
-                // Placeholder authentication logic
-                Toast.makeText(this, "Welcome $username", Toast.LENGTH_SHORT).show()
-                navigateToMain()
+            if (email.isNotEmpty() && password.isNotEmpty()) {
+                binding.login.isEnabled = false
+                lifecycleScope.launch {
+                    val result = authRepository.login(email, password)
+                    if (result.isSuccess) {
+                        Toast.makeText(this@LoginActivity, "Welcome $email", Toast.LENGTH_SHORT).show()
+                        navigateToMain()
+                    } else {
+                        binding.login.isEnabled = true
+                        val error = result.exceptionOrNull()?.message ?: "Unknown error"
+                        Toast.makeText(this@LoginActivity, "Login Failed: $error", Toast.LENGTH_SHORT).show()
+                    }
+                }
             } else {
-                Toast.makeText(this, "Please enter username and password", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show()
             }
         }
 
