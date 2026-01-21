@@ -1,6 +1,7 @@
 package com.sbuddy.app.data.repository
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import com.sbuddy.app.data.model.User
 import kotlinx.coroutines.tasks.await
@@ -28,27 +29,47 @@ class AuthRepository {
                 Result.failure(Exception("User not found after login"))
             }
         } catch (e: Exception) {
-            // Bypass validation on error (e.g., API key invalid)
-            val mockUser = User(uid = "mock_user_id", email = email, displayName = "Mock User")
-            Result.success(mockUser)
+            Result.failure(e)
         }
     }
 
-    suspend fun signUp(email: String, password: String, mobile: String): Result<User> {
+    suspend fun signUp(email: String, password: String): Result<User> {
         return try {
             auth.createUserWithEmailAndPassword(email, password).await()
             val firebaseUser = auth.currentUser
             if (firebaseUser != null) {
-                val user = User(uid = firebaseUser.uid, email = email, mobile = mobile)
+                val user = User(uid = firebaseUser.uid, email = email)
                 firestore.collection("users").document(user.uid).set(user).await()
                 Result.success(user)
             } else {
                 Result.failure(Exception("User creation failed"))
             }
         } catch (e: Exception) {
-            // Bypass validation on error
-            val mockUser = User(uid = "mock_user_id", email = email, mobile = mobile, displayName = "Mock User")
-            Result.success(mockUser)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun signInWithGoogle(idToken: String): Result<User> {
+        return try {
+            val credential = GoogleAuthProvider.getCredential(idToken, null)
+            auth.signInWithCredential(credential).await()
+            val firebaseUser = auth.currentUser
+            if (firebaseUser != null) {
+                val document = firestore.collection("users").document(firebaseUser.uid).get().await()
+                // If user doesn't exist in Firestore, create them
+                val user = if (document.exists()) {
+                    document.toObject(User::class.java) ?: User(firebaseUser.uid, firebaseUser.displayName, firebaseUser.email)
+                } else {
+                    val newUser = User(uid = firebaseUser.uid, email = firebaseUser.email, displayName = firebaseUser.displayName)
+                    firestore.collection("users").document(newUser.uid).set(newUser).await()
+                    newUser
+                }
+                Result.success(user)
+            } else {
+                Result.failure(Exception("User creation failed with Google Sign In"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 }
