@@ -20,6 +20,11 @@ class LoginActivity : BaseActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        if (authRepository.getCurrentUser() != null) {
+            navigateToMain()
+            return
+        }
+
         binding.login.setOnClickListener {
             val email = binding.username.text.toString()
             val password = binding.password.text.toString()

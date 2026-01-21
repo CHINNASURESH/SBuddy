@@ -27,7 +27,13 @@ class SignUpActivity : BaseActivity() {
             val account = task.getResult(ApiException::class.java)
             account.idToken?.let { firebaseAuthWithGoogle(it) }
         } catch (e: ApiException) {
-            Toast.makeText(this, "Google Sign In Failed: ${e.statusCode}", Toast.LENGTH_SHORT).show()
+            if (authRepository.isMockMode) {
+                Toast.makeText(this, "Google Sign In Failed: ${e.statusCode}. Using Mock Login.", Toast.LENGTH_SHORT).show()
+                // Fallback for mock environment
+                firebaseAuthWithGoogle("mock_token")
+            } else {
+                Toast.makeText(this, "Google Sign In Failed: ${e.statusCode}", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

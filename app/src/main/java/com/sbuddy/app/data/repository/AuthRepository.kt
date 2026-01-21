@@ -1,5 +1,6 @@
 package com.sbuddy.app.data.repository
 
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
@@ -10,14 +11,37 @@ class AuthRepository {
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val firestore: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
 
+    // Check if we are running with the mock google-services.json
+    val isMockMode: Boolean by lazy {
+        try {
+            FirebaseApp.getInstance().options.projectId == "mock-project-id"
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    companion object {
+        private var mockUser: User? = null
+
+        fun createMockSession(user: User) {
+            mockUser = user
+        }
+    }
+
     fun getCurrentUser(): User? {
         val firebaseUser = auth.currentUser
         return firebaseUser?.let {
             User(it.uid, it.displayName, it.email)
-        }
+        } ?: mockUser
     }
 
     suspend fun login(email: String, password: String): Result<User> {
+        if (isMockMode) {
+            val user = User(uid = "mock-uid", email = email, displayName = "Mock User")
+            mockUser = user
+            return Result.success(user)
+        }
+
         return try {
             auth.signInWithEmailAndPassword(email, password).await()
             val firebaseUser = auth.currentUser
@@ -34,6 +58,12 @@ class AuthRepository {
     }
 
     suspend fun signUp(email: String, password: String): Result<User> {
+        if (isMockMode) {
+            val user = User(uid = "mock-uid", email = email, displayName = "Mock User")
+            mockUser = user
+            return Result.success(user)
+        }
+
         return try {
             auth.createUserWithEmailAndPassword(email, password).await()
             val firebaseUser = auth.currentUser
@@ -50,6 +80,12 @@ class AuthRepository {
     }
 
     suspend fun signInWithGoogle(idToken: String): Result<User> {
+        if (isMockMode) {
+            val user = User(uid = "mock-uid-google", email = "mock@gmail.com", displayName = "Mock Google User")
+            mockUser = user
+            return Result.success(user)
+        }
+
         return try {
             val credential = GoogleAuthProvider.getCredential(idToken, null)
             auth.signInWithCredential(credential).await()
@@ -71,5 +107,12 @@ class AuthRepository {
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    fun logout() {
+        if (isMockMode) {
+            mockUser = null
+        }
+        auth.signOut()
     }
 }
