@@ -115,4 +115,36 @@ class AuthRepository {
         }
         auth.signOut()
     }
+
+    suspend fun sendPasswordResetEmail(email: String): Result<Unit> {
+        if (isMockMode) {
+            return Result.success(Unit)
+        }
+        return try {
+            auth.sendPasswordResetEmail(email).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun updateProfile(user: User): Result<Unit> {
+        if (isMockMode) {
+            mockUser = user
+            return Result.success(Unit)
+        }
+        return try {
+            // Update Firestore
+            firestore.collection("users").document(user.uid).set(user).await()
+            // Also update Firebase Auth Profile if needed (displayName)
+            val profileUpdates = com.google.firebase.auth.UserProfileChangeRequest.Builder()
+                .setDisplayName(user.displayName)
+                .build()
+            auth.currentUser?.updateProfile(profileUpdates)?.await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
