@@ -44,8 +44,19 @@
         android:background="#E0E0E0"
         android:hint="Password"
         android:padding="16dp"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="16dp"
         android:inputType="textPassword" />
+
+    <TextView
+        android:id="@+id/forgot_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Forgot Password?"
+        android:textColor="#9C27B0"
+        android:layout_gravity="end"
+        android:layout_marginBottom="32dp"
+        android:clickable="true"
+        android:focusable="true"/>
 
     <!-- Sign In Button -->
     <Button
