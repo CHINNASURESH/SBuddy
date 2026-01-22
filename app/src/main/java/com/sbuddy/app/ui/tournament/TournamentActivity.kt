@@ -10,15 +10,19 @@ import android.widget.ImageButton
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.sbuddy.app.BaseActivity
 import com.sbuddy.app.R
+import com.sbuddy.app.data.model.Tournament
+import com.sbuddy.app.data.repository.TournamentRepository
 import com.sbuddy.app.utils.TournamentManager
+import kotlinx.coroutines.launch
 
 class TournamentActivity : BaseActivity() {
 
     private val participants = mutableListOf<String>()
     private val tournamentManager = TournamentManager()
+    private val tournamentRepository = TournamentRepository()
     private var topSeed: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,6 +32,7 @@ class TournamentActivity : BaseActivity() {
         val inputName = findViewById<EditText>(R.id.input_player_name)
         val btnAdd = findViewById<Button>(R.id.btn_add_player)
         val btnGenerate = findViewById<Button>(R.id.btn_generate_fixtures)
+        val btnViewPublic = findViewById<Button>(R.id.btn_view_public)
         val txtCount = findViewById<TextView>(R.id.txt_participants_count)
         val txtBracket = findViewById<TextView>(R.id.txt_bracket)
         val checkSeed = findViewById<CheckBox>(R.id.check_top_seed)
@@ -42,7 +47,7 @@ class TournamentActivity : BaseActivity() {
         val adapter = ArrayAdapter(
             this,
             android.R.layout.simple_spinner_item,
-            listOf("Knockout", "Round Robin")
+            listOf("Knockout", "League")
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerType.adapter = adapter
@@ -77,8 +82,8 @@ class TournamentActivity : BaseActivity() {
             }
 
             val selectedType = spinnerType.selectedItem as String
-            val bracketText = if (selectedType == "Round Robin") {
-                tournamentManager.generateRoundRobinText(participants)
+            val bracketText = if (selectedType == "League") {
+                tournamentManager.generateLeagueText(participants)
             } else {
                 tournamentManager.generateBracketText(participants, topSeed)
             }
@@ -87,8 +92,27 @@ class TournamentActivity : BaseActivity() {
             txtBracket.gravity = android.view.Gravity.START
 
             if (checkPublic.isChecked) {
-                Toast.makeText(this, "Tournament is now Public!", Toast.LENGTH_SHORT).show()
+                val tName = inputTournamentName.text.toString().ifEmpty { "Tournament" }
+                val tournament = Tournament(
+                    name = tName,
+                    participants = participants,
+                    bracketText = bracketText,
+                    isPublic = true
+                )
+
+                lifecycleScope.launch {
+                    val result = tournamentRepository.saveTournament(tournament)
+                    if (result.isSuccess) {
+                        Toast.makeText(this@TournamentActivity, "Tournament saved publicly!", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this@TournamentActivity, "Failed to save tournament", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
+        }
+
+        btnViewPublic.setOnClickListener {
+             startActivity(Intent(this, PublicTournamentsActivity::class.java))
         }
 
         btnShare.setOnClickListener {

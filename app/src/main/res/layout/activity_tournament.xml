@@ -163,6 +163,14 @@
                         android:layout_height="wrap_content"
                         android:text="Generate Fixtures"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+                    <Button
+                        android:id="@+id/btn_view_public"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="View Public Tournaments"
+                        android:layout_marginTop="8dp"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"/>
                  </LinearLayout>
             </androidx.cardview.widget.CardView>
         </LinearLayout>
