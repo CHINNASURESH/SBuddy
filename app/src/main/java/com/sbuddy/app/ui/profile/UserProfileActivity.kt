@@ -41,8 +41,13 @@ class UserProfileActivity : BaseActivity() {
 
         btnSave.setOnClickListener {
             val newName = inputName.text.toString().trim()
+            val newMobile = inputMobile.text.toString().trim()
+
             if (newName.isNotEmpty()) {
-                val updatedUser = currentUser.copy(displayName = newName)
+                val updatedUser = currentUser.copy(
+                    displayName = newName,
+                    mobile = newMobile
+                )
                 lifecycleScope.launch {
                     val result = authRepository.updateProfile(updatedUser)
                     if (result.isSuccess) {

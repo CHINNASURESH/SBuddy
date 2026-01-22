@@ -8,7 +8,7 @@ class TournamentRepository {
     private val firestore: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
     private val collection = firestore.collection("tournaments")
 
-    suspend fun saveTournament(tournament: Tournament): Result<Unit> {
+    suspend fun saveTournament(tournament: Tournament): Result<String> {
         return try {
             val docRef = if (tournament.id.isEmpty()) {
                 collection.document()
@@ -17,7 +17,7 @@ class TournamentRepository {
             }
             val tournamentToSave = tournament.copy(id = docRef.id)
             docRef.set(tournamentToSave).await()
-            Result.success(Unit)
+            Result.success(docRef.id)
         } catch (e: Exception) {
             Result.failure(e)
         }

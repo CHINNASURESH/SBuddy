@@ -6,5 +6,6 @@ data class Tournament(
     val participants: List<String> = emptyList(),
     val rounds: List<Match> = emptyList(),
     val bracketText: String = "",
-    val isPublic: Boolean = false
+    val isPublic: Boolean = false,
+    val imageUrl: String = ""
 )

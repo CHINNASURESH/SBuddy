@@ -82,40 +82,33 @@ class GroupDetailActivity : BaseActivity() {
     }
 
     private fun showInviteDialog() {
-        inviteDialogInput = EditText(this)
-        inviteDialogInput?.hint = "Friend's Name"
-        val container = android.widget.FrameLayout(this)
-        val params = android.widget.FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        params.leftMargin = 50
-        params.rightMargin = 50
-        inviteDialogInput?.layoutParams = params
-        container.addView(inviteDialogInput)
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_invite_member, null)
+        val inputName = dialogView.findViewById<EditText>(R.id.input_invite_name)
+        val btnInvite = dialogView.findViewById<Button>(R.id.btn_invite)
+        val btnCancel = dialogView.findViewById<Button>(R.id.btn_cancel_invite)
+        val btnContacts = dialogView.findViewById<Button>(R.id.btn_pick_contact)
 
         val dialog = AlertDialog.Builder(this)
-            .setTitle("Invite Friend")
-            .setMessage("Enter the name of the friend you want to invite:")
-            .setView(container)
-            .setPositiveButton("Invite") { _, _ ->
-                val name = inviteDialogInput?.text.toString().trim()
-                addMemberToGroup(name)
-            }
-            .setNeutralButton("Pick from Contacts") { _, _ ->
-                // This specific click will be overridden in the show() listener below
-                // to prevent dialog dismissal, but we handle the logic via a separate button or permission check
-            }
-            .setNegativeButton("Cancel", null)
+            .setView(dialogView)
+            .setCancelable(true)
             .create()
 
-        dialog.show()
+        btnInvite.setOnClickListener {
+            val name = inputName.text.toString().trim()
+            addMemberToGroup(name)
+            dialog.dismiss()
+        }
 
-        // Override the Neutral button click to handle permission without dismissing immediately
-        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener {
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        btnContacts.setOnClickListener {
             checkContactPermission()
             dialog.dismiss()
         }
+
+        dialog.show()
     }
 
     private fun addMemberToGroup(name: String) {

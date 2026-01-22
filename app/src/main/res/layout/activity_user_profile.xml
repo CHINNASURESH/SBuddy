@@ -65,7 +65,16 @@
                     android:id="@+id/profile_mobile"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:enabled="false"/>
+                    android:inputType="phone"/>
+
+                <Button
+                    android:id="@+id/btn_save_profile"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Save Profile"
+                    android:layout_marginTop="24dp"
+                    android:backgroundTint="#9C27B0"
+                    android:textColor="#FFFFFF"/>
 
                 <Button
                     android:id="@+id/btn_save_profile"
