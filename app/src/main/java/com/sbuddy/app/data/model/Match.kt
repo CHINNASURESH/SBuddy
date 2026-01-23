@@ -8,5 +8,8 @@ data class Match(
     val player2Score: Int = 0,
     val timestamp: Long = System.currentTimeMillis(),
     val winner: String? = null,
-    val isSingles: Boolean = false
+    val isSingles: Boolean = false,
+    val matchLabel: String = "",
+    val sourceMatchId1: String? = null,
+    val sourceMatchId2: String? = null
 )

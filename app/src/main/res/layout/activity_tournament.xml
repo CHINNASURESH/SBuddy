@@ -296,6 +296,15 @@
                         android:textStyle="bold"/>
 
                     <ImageButton
+                        android:id="@+id/btn_toggle_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@android:drawable/ic_menu_sort_by_size"
+                        android:background="?attr/selectableItemBackground"
+                        android:padding="8dp"
+                        android:tooltipText="Toggle List/Text View"/>
+
+                    <ImageButton
                         android:id="@+id/btn_edit_fixtures"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -322,8 +331,11 @@
                     android:layout_marginBottom="16dp"/>
 
                 <ScrollView
+                    android:id="@+id/scroll_bracket_text"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:visibility="visible">
                     <EditText
                         android:id="@+id/txt_bracket"
                         android:layout_width="match_parent"
@@ -337,6 +349,14 @@
                         android:inputType="textMultiLine|textNoSuggestions"
                         android:minLines="10"/>
                 </ScrollView>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler_fixtures"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:visibility="gone"
+                    android:padding="8dp"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
