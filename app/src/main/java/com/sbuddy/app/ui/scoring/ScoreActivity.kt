@@ -36,6 +36,10 @@ class ScoreActivity : BaseActivity() {
     private var p3Name = "Player 3"
     private var p4Name = "Player 4"
 
+    private var matchId: String? = null
+    private var tournamentId: String? = null
+    private var matchLabel: String? = null
+
     private var t1LeftName = ""
     private var t1RightName = ""
     private var t2LeftName = ""
@@ -84,6 +88,10 @@ class ScoreActivity : BaseActivity() {
         repository = MatchRepository(applicationContext)
 
         if (savedInstanceState != null) {
+            matchId = savedInstanceState.getString("MATCH_ID")
+            tournamentId = savedInstanceState.getString("TOURNAMENT_ID")
+            matchLabel = savedInstanceState.getString("MATCH_LABEL")
+
             scoreP1 = savedInstanceState.getInt("SCORE_P1", 0)
             scoreP2 = savedInstanceState.getInt("SCORE_P2", 0)
             currentServer = savedInstanceState.getString("CURRENT_SERVER", "Team 1")
@@ -102,6 +110,10 @@ class ScoreActivity : BaseActivity() {
             t2LeftName = savedInstanceState.getString("T2_LEFT", p4Name)
             t2RightName = savedInstanceState.getString("T2_RIGHT", p3Name)
         } else {
+            matchId = intent.getStringExtra("MATCH_ID")
+            tournamentId = intent.getStringExtra("TOURNAMENT_ID")
+            matchLabel = intent.getStringExtra("MATCH_LABEL")
+
             maxScore = intent.getIntExtra("MAX_SCORE", 21)
             team1Name = intent.getStringExtra("TEAM_1_NAME") ?: "Team 1"
             team2Name = intent.getStringExtra("TEAM_2_NAME") ?: "Team 2"
@@ -451,6 +463,10 @@ class ScoreActivity : BaseActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+        outState.putString("MATCH_ID", matchId)
+        outState.putString("TOURNAMENT_ID", tournamentId)
+        outState.putString("MATCH_LABEL", matchLabel)
+
         outState.putInt("SCORE_P1", scoreP1)
         outState.putInt("SCORE_P2", scoreP2)
         outState.putString("CURRENT_SERVER", currentServer)
@@ -469,17 +485,28 @@ class ScoreActivity : BaseActivity() {
     }
 
     private fun saveGame(winner: String) {
+        val idToUse = matchId ?: UUID.randomUUID().toString()
         val match = Match(
-            id = UUID.randomUUID().toString(),
+            id = idToUse,
             player1Name = team1Name,
             player2Name = team2Name,
             player1Score = scoreP1,
             player2Score = scoreP2,
             timestamp = System.currentTimeMillis(),
             winner = winner,
-            isSingles = isSingles
+            isSingles = isSingles,
+            matchLabel = matchLabel ?: ""
         )
         repository.saveMatch(match)
+
+        if (tournamentId != null) {
+            val resultIntent = android.content.Intent()
+            resultIntent.putExtra("MATCH_ID", idToUse)
+            resultIntent.putExtra("WINNER", winner)
+            resultIntent.putExtra("SCORE_P1", scoreP1)
+            resultIntent.putExtra("SCORE_P2", scoreP2)
+            setResult(RESULT_OK, resultIntent)
+        }
     }
 
     private fun showGameOverDialog(winnerName: String, finalScore: String) {
