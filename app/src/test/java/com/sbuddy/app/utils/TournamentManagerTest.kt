@@ -27,4 +27,26 @@ class TournamentManagerTest {
         // Case-insensitive check or check for specific string
         assertTrue(bracketText.contains("Bye", ignoreCase = true))
     }
+
+    @Test
+    fun testGenerateLeagueTextSmall() {
+        // Less than or equal 5 -> Single group
+        val participants = listOf("A", "B", "C", "D")
+        val text = manager.generateLeagueText(participants)
+        assertTrue(text.contains("=== LEAGUE STAGE ==="))
+        assertTrue(text.contains("=== FINAL ===")) // Logic updated to include Final placeholder
+        assertFalse(text.contains("=== GROUP A ==="))
+    }
+
+    @Test
+    fun testGenerateLeagueTextLarge() {
+        // More than 5 -> Multiple groups
+        val participants = listOf("A", "B", "C", "D", "E", "F")
+        val text = manager.generateLeagueText(participants)
+        // 6 players -> 2 groups of 3
+        assertTrue(text.contains("=== GROUP A ==="))
+        assertTrue(text.contains("=== GROUP B ==="))
+        assertTrue(text.contains("=== KNOCKOUT STAGE ===")) // Logic updated to include Knockout
+        assertTrue(text.contains("Semi-Final 1"))
+    }
 }

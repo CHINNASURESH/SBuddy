@@ -25,6 +25,22 @@ class LoginActivity : BaseActivity() {
             return
         }
 
+        binding.forgotPassword.setOnClickListener {
+            val email = binding.username.text.toString()
+            if (email.isNotEmpty()) {
+                lifecycleScope.launch {
+                    val result = authRepository.sendPasswordResetEmail(email)
+                    if (result.isSuccess) {
+                        Toast.makeText(this@LoginActivity, "Reset link sent to $email", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this@LoginActivity, "Failed to send reset link", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } else {
+                Toast.makeText(this, "Please enter your email to reset password", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         binding.login.setOnClickListener {
             val email = binding.username.text.toString()
             val password = binding.password.text.toString()

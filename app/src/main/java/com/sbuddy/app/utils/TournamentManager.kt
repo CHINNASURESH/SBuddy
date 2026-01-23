@@ -110,6 +110,63 @@ class TournamentManager {
         return sb.toString()
     }
 
+    /**
+     * Generates a League format with Group Stages.
+     * Splits participants into groups (approx 4-5 per group) and generates Round Robin for each.
+     */
+    fun generateLeagueText(participants: List<String>): String {
+        if (participants.size < 3) return generateRoundRobinText(participants)
+
+        val sb = StringBuilder()
+
+        // Determine number of groups. Target size 4-5.
+        // If 6 players -> 2 groups of 3.
+        val groupCount = if (participants.size > 5) (participants.size + 3) / 4 else 1
+
+        if (groupCount == 1) {
+            sb.append("=== LEAGUE STAGE ===\n\n")
+            sb.append(generateRoundRobinText(participants))
+            sb.append("\n=== FINAL ===\n")
+            sb.append("Match: 1st Place vs 2nd Place\n")
+            sb.append("Winner: ____________\n")
+            sb.append("Runner-up: ____________\n")
+            return sb.toString()
+        }
+
+        // Shuffle and split
+        val shuffled = participants.shuffled()
+        val groups = MutableList(groupCount) { mutableListOf<String>() }
+
+        shuffled.forEachIndexed { index, p ->
+            groups[index % groupCount].add(p)
+        }
+
+        groups.forEachIndexed { index, groupMembers ->
+            val groupName = (65 + index).toChar() // A, B, C...
+            sb.append("=== GROUP $groupName ===\n")
+            sb.append(generateRoundRobinText(groupMembers))
+            sb.append("\n")
+        }
+
+        sb.append("=== KNOCKOUT STAGE ===\n\n")
+        if (groupCount == 2) {
+            sb.append("Semi-Final 1: Winner Grp A vs Runner-up Grp B\n")
+            sb.append("Semi-Final 2: Winner Grp B vs Runner-up Grp A\n\n")
+            sb.append("Final: Winner SF1 vs Winner SF2\n")
+            sb.append("Winner: ____________\n")
+            sb.append("Runner-up: ____________\n")
+        } else if (groupCount >= 4) {
+            sb.append("Quarter-Finals: Winners vs Runners-up (Cross Group)\n")
+            sb.append("Semi-Finals: Winner QF1 vs Winner QF2...\n")
+            sb.append("Final: Winner SF1 vs Winner SF2\n")
+        } else {
+            // 3 groups or generic
+            sb.append("Semi-Finals & Finals (Check rules for 3 groups)\n")
+        }
+
+        return sb.toString()
+    }
+
     // Kept for backward compatibility if needed
     fun generateFixtures(participants: List<String>): List<Match> {
         return emptyList()
