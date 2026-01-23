@@ -34,6 +34,26 @@
         android:layout_marginBottom="16dp"
         android:minHeight="48dp" />
 
+    <RadioGroup
+        android:id="@+id/radio_group_mode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+        <RadioButton
+            android:id="@+id/radio_singles"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Singles"
+            android:checked="true"
+            android:layout_marginEnd="16dp"/>
+        <RadioButton
+            android:id="@+id/radio_doubles"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Doubles"/>
+    </RadioGroup>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -95,6 +115,14 @@
                             android:textSize="12sp"/>
                     </LinearLayout>
 
+                    <ImageView
+                        android:id="@+id/img_tournament_preview"
+                        android:layout_width="match_parent"
+                        android:layout_height="150dp"
+                        android:scaleType="centerCrop"
+                        android:visibility="gone"
+                        android:layout_marginBottom="8dp"/>
+
                     <EditText
                         android:id="@+id/input_tournament_name"
                         android:layout_width="match_parent"
@@ -103,6 +131,16 @@
                         android:background="#E0E0E0"
                         android:padding="10dp"
                         android:layout_marginBottom="8dp"/>
+
+                    <EditText
+                        android:id="@+id/input_player_name_2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Player 2 Name"
+                        android:background="#E0E0E0"
+                        android:padding="10dp"
+                        android:layout_marginBottom="8dp"
+                        android:visibility="gone"/>
 
                     <EditText
                         android:id="@+id/input_tournament_category"
@@ -256,6 +294,15 @@
                         android:text="Fixtures"
                         android:textSize="18sp"
                         android:textStyle="bold"/>
+
+                    <ImageButton
+                        android:id="@+id/btn_edit_fixtures"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@android:drawable/ic_menu_edit"
+                        android:background="?attr/selectableItemBackground"
+                        android:padding="8dp"
+                        android:tooltipText="Edit Fixtures"/>
 
                     <ImageButton
                         android:id="@+id/btn_share_fixtures"

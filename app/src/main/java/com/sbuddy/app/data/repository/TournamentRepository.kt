@@ -10,12 +10,18 @@ class TournamentRepository {
 
     suspend fun saveTournament(tournament: Tournament): Result<String> {
         return try {
+            // If ID exists, update. If not, create new.
+            // Using set() with merge is safer for updates, but since we overwrite the whole object here:
             val docRef = if (tournament.id.isEmpty()) {
                 collection.document()
             } else {
                 collection.document(tournament.id)
             }
+
+            // Ensure the tournament object has the correct ID before saving
             val tournamentToSave = tournament.copy(id = docRef.id)
+
+            // Use set (overwrite)
             docRef.set(tournamentToSave).await()
             Result.success(docRef.id)
         } catch (e: Exception) {

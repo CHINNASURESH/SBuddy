@@ -38,6 +38,7 @@ class TournamentActivity : BaseActivity() {
         setContentView(R.layout.activity_tournament)
 
         val inputName = findViewById<EditText>(R.id.input_player_name)
+        val inputName2 = findViewById<EditText>(R.id.input_player_name_2)
         val btnAdd = findViewById<Button>(R.id.btn_add_player)
         val btnGenerate = findViewById<Button>(R.id.btn_generate_fixtures)
         val btnPublish = findViewById<Button>(R.id.btn_publish)
@@ -46,9 +47,11 @@ class TournamentActivity : BaseActivity() {
         val txtBracket = findViewById<EditText>(R.id.txt_bracket)
         val checkSeed = findViewById<CheckBox>(R.id.check_top_seed)
         val btnShare = findViewById<ImageButton>(R.id.btn_share_fixtures)
+        val btnEdit = findViewById<ImageButton>(R.id.btn_edit_fixtures)
 
         val btnSelectImage = findViewById<Button>(R.id.btn_select_image)
         val txtImageStatus = findViewById<TextView>(R.id.txt_image_status)
+        val imgPreview = findViewById<android.widget.ImageView>(R.id.img_tournament_preview)
         val btnImport = findViewById<ImageButton>(R.id.btn_import_excel)
         val btnDownload = findViewById<ImageButton>(R.id.btn_download_excel)
 
@@ -57,6 +60,11 @@ class TournamentActivity : BaseActivity() {
         val inputCategory = findViewById<EditText>(R.id.input_tournament_category)
         val checkPublic = findViewById<CheckBox>(R.id.check_public)
         val spinnerType = findViewById<Spinner>(R.id.spinner_tournament_type)
+        val radioGroupMode = findViewById<android.widget.RadioGroup>(R.id.radio_group_mode)
+
+        // Default to Read-Only
+        txtBracket.focusable = android.view.View.NOT_FOCUSABLE
+        txtBracket.isFocusableInTouchMode = false
 
         // Setup Spinner
         val adapter = ArrayAdapter(
@@ -67,8 +75,30 @@ class TournamentActivity : BaseActivity() {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerType.adapter = adapter
 
+        radioGroupMode.setOnCheckedChangeListener { _, checkedId ->
+            if (checkedId == R.id.radio_doubles) {
+                inputName2.visibility = android.view.View.VISIBLE
+                inputName.hint = "Player 1 Name"
+            } else {
+                inputName2.visibility = android.view.View.GONE
+                inputName.hint = "Player Name"
+            }
+        }
+
         btnAdd.setOnClickListener {
-            val name = inputName.text.toString().trim()
+            var name = inputName.text.toString().trim()
+            val name2 = inputName2.text.toString().trim()
+            val isDoubles = radioGroupMode.checkedRadioButtonId == R.id.radio_doubles
+
+            if (isDoubles) {
+                if (name.isNotEmpty() && name2.isNotEmpty()) {
+                    name = "$name & $name2"
+                } else {
+                    Toast.makeText(this, "Both Player 1 and Player 2 required for Doubles", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+            }
+
             if (name.isNotEmpty()) {
                 if (participants.contains(name)) {
                     Toast.makeText(this, "Already added", Toast.LENGTH_SHORT).show()
@@ -86,6 +116,7 @@ class TournamentActivity : BaseActivity() {
                 }
 
                 inputName.text.clear()
+                inputName2.text.clear()
                 txtCount.text = "Participants: ${participants.size}"
             }
         }
@@ -161,6 +192,15 @@ class TournamentActivity : BaseActivity() {
             startActivityForResult(intent, REQUEST_IMAGE)
         }
 
+        btnEdit.setOnClickListener {
+            txtBracket.focusable = android.view.View.FOCUSABLE
+            txtBracket.isFocusableInTouchMode = true
+            txtBracket.requestFocus()
+            val imm = getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+            imm.showSoftInput(txtBracket, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
+            Toast.makeText(this, "Editing Enabled", Toast.LENGTH_SHORT).show()
+        }
+
         btnImport.setOnClickListener {
             val intent = Intent(Intent.ACTION_GET_CONTENT)
             intent.type = "*/*" // Allow all to ensure CSV/Text are picked up easily
@@ -190,9 +230,23 @@ class TournamentActivity : BaseActivity() {
                 REQUEST_IMAGE -> {
                     selectedImageUri = data.data
                     val statusText = findViewById<TextView>(R.id.txt_image_status)
+                    val imgPreview = findViewById<android.widget.ImageView>(R.id.img_tournament_preview)
+
                     statusText.text = "Image Selected"
-                    // Grant permission to access this URI persistently if needed,
-                    // but for this scope we just hold the URI.
+                    imgPreview.visibility = android.view.View.VISIBLE
+                    imgPreview.setImageURI(selectedImageUri)
+
+                    // Persist permission so we can read it later
+                    selectedImageUri?.let { uri ->
+                        try {
+                            contentResolver.takePersistableUriPermission(
+                                uri,
+                                Intent.FLAG_GRANT_READ_URI_PERMISSION
+                            )
+                        } catch (e: Exception) {
+                            // Ignored if not possible
+                        }
+                    }
                 }
                 REQUEST_IMPORT -> {
                     data.data?.let { uri ->
