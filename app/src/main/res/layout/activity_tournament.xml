@@ -133,16 +133,6 @@
                         android:layout_marginBottom="8dp"/>
 
                     <EditText
-                        android:id="@+id/input_player_name_2"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Player 2 Name"
-                        android:background="#E0E0E0"
-                        android:padding="10dp"
-                        android:layout_marginBottom="8dp"
-                        android:visibility="gone"/>
-
-                    <EditText
                         android:id="@+id/input_tournament_category"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -203,6 +193,16 @@
                         android:background="#E0E0E0"
                         android:padding="10dp"
                         android:layout_marginBottom="8dp"/>
+
+                    <EditText
+                        android:id="@+id/input_player_name_2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Player 2 Name"
+                        android:background="#E0E0E0"
+                        android:padding="10dp"
+                        android:layout_marginBottom="8dp"
+                        android:visibility="gone"/>
 
                     <CheckBox
                         android:id="@+id/check_top_seed"
