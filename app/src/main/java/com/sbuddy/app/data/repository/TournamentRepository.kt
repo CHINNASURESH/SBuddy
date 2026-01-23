@@ -53,4 +53,20 @@ class TournamentRepository {
             Result.failure(e)
         }
     }
+
+    suspend fun getTournament(id: String): Result<Tournament?> {
+        if (isMockMode) {
+            return Result.success(null)
+        }
+        return try {
+            val doc = collection.document(id).get().await()
+            if (doc.exists()) {
+                Result.success(doc.toObject(Tournament::class.java))
+            } else {
+                Result.success(null)
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
