@@ -30,12 +30,12 @@ class FixtureAdapter(
     }
 
     override fun onBindViewHolder(holder: FixtureViewHolder, position: Int) {
-        holder.bind(matches[position], onScoreClick)
+        holder.bind(matches[position], onScoreClick, isReadOnly)
     }
 
     override fun getItemCount() = matches.size
 
-    inner class FixtureViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class FixtureViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val txtLabel: TextView = itemView.findViewById(R.id.txt_match_label)
         private val txtP1: TextView = itemView.findViewById(R.id.txt_player1)
         private val txtP2: TextView = itemView.findViewById(R.id.txt_player2)
@@ -44,7 +44,7 @@ class FixtureAdapter(
         private val btnScore: Button = itemView.findViewById(R.id.btn_score)
         private val txtWinner: TextView = itemView.findViewById(R.id.txt_winner)
 
-        fun bind(match: Match, onScoreClick: (Match) -> Unit) {
+        fun bind(match: Match, onScoreClick: (Match) -> Unit, isReadOnly: Boolean) {
             txtLabel.text = match.matchLabel
             txtP1.text = match.player1Name
             txtP2.text = match.player2Name
