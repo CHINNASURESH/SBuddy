@@ -97,7 +97,7 @@ class TournamentActivity : BaseActivity() {
             intent.putExtra("IS_SINGLES", radioGroupMode.checkedRadioButtonId == R.id.radio_singles)
 
             scoreLauncher.launch(intent)
-        }
+        })
         recyclerFixtures.adapter = fixtureAdapter
 
         // Init Score Launcher
