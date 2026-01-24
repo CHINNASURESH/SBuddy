@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -27,7 +26,9 @@ class PublicTournamentsActivity : BaseActivity() {
         val recyclerView = findViewById<RecyclerView>(R.id.recycler_view_tournaments)
         recyclerView.layoutManager = LinearLayoutManager(this)
         adapter = TournamentAdapter { tournament ->
-            showBracketDialog(tournament)
+            val intent = android.content.Intent(this, TournamentDetailActivity::class.java)
+            intent.putExtra("TOURNAMENT_ID", tournament.id)
+            startActivity(intent)
         }
         recyclerView.adapter = adapter
 
@@ -40,17 +41,6 @@ class PublicTournamentsActivity : BaseActivity() {
         }
     }
 
-    private fun showBracketDialog(tournament: Tournament) {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle(tournament.name)
-
-        // Show bracket text
-        val message = if (tournament.bracketText.isNotEmpty()) tournament.bracketText else "No fixtures generated."
-
-        builder.setMessage(message)
-        builder.setPositiveButton("Close", null)
-        builder.show()
-    }
 }
 
 class TournamentAdapter(private val onItemClick: (Tournament) -> Unit) : RecyclerView.Adapter<TournamentAdapter.ViewHolder>() {
@@ -77,10 +67,19 @@ class TournamentAdapter(private val onItemClick: (Tournament) -> Unit) : Recycle
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val nameView: TextView = itemView.findViewById(R.id.text_tournament_name)
         private val countView: TextView = itemView.findViewById(R.id.text_participants_count)
+        private val locView: TextView = itemView.findViewById(R.id.text_tournament_location)
 
         fun bind(tournament: Tournament, onItemClick: (Tournament) -> Unit) {
             nameView.text = tournament.name
             countView.text = "Participants: ${tournament.participants.size}"
+
+            if (tournament.location.isNotEmpty()) {
+                locView.visibility = View.VISIBLE
+                locView.text = "📍 ${tournament.location}"
+            } else {
+                locView.visibility = View.GONE
+            }
+
             itemView.setOnClickListener { onItemClick(tournament) }
         }
     }
