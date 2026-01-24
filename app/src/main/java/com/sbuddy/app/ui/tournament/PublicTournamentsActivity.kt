@@ -39,6 +39,10 @@ class PublicTournamentsActivity : BaseActivity() {
                 adapter.setTournaments(tournaments)
             }
         }
+
+        findViewById<View>(R.id.fab_create_tournament).setOnClickListener {
+            startActivity(android.content.Intent(this, TournamentActivity::class.java))
+        }
     }
 
 }
