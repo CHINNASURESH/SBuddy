@@ -67,10 +67,19 @@ class TournamentAdapter(private val onItemClick: (Tournament) -> Unit) : Recycle
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val nameView: TextView = itemView.findViewById(R.id.text_tournament_name)
         private val countView: TextView = itemView.findViewById(R.id.text_participants_count)
+        private val locView: TextView = itemView.findViewById(R.id.text_tournament_location)
 
         fun bind(tournament: Tournament, onItemClick: (Tournament) -> Unit) {
             nameView.text = tournament.name
             countView.text = "Participants: ${tournament.participants.size}"
+
+            if (tournament.location.isNotEmpty()) {
+                locView.visibility = View.VISIBLE
+                locView.text = "📍 ${tournament.location}"
+            } else {
+                locView.visibility = View.GONE
+            }
+
             itemView.setOnClickListener { onItemClick(tournament) }
         }
     }

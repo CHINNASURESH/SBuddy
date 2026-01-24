@@ -43,11 +43,21 @@ class TournamentRepository {
 
     suspend fun getPublicTournaments(): Result<List<Tournament>> {
         if (isMockMode) {
-            return Result.success(emptyList())
+            // Return some mock data to verify UI
+             val mockData = listOf(
+                Tournament(id = "mock1", name = "Mock Tournament 1", isPublic = true, location = "New York"),
+                Tournament(id = "mock2", name = "Mock Tournament 2", isPublic = true, location = "London")
+            )
+            return Result.success(mockData)
         }
         return try {
             val snapshot = collection.whereEqualTo("isPublic", true).get().await()
-            val tournaments = snapshot.toObjects(Tournament::class.java)
+            var tournaments = snapshot.toObjects(Tournament::class.java)
+
+            // Simple sort: Put tournaments with location at the top (simulating 'nearby' priority if user has location)
+            // Ideally, we would sort by distance from user. For now, we prioritize those that HAVE a location.
+            tournaments = tournaments.sortedByDescending { it.location.isNotEmpty() }
+
             Result.success(tournaments)
         } catch (e: Exception) {
             Result.failure(e)
@@ -56,6 +66,11 @@ class TournamentRepository {
 
     suspend fun getTournament(id: String): Result<Tournament?> {
         if (isMockMode) {
+            if (id == "mock1") {
+                return Result.success(Tournament(id = "mock1", name = "Mock Tournament 1", isPublic = true, location = "New York"))
+            } else if (id == "mock2") {
+                return Result.success(Tournament(id = "mock2", name = "Mock Tournament 2", isPublic = true, location = "London"))
+            }
             return Result.success(null)
         }
         return try {

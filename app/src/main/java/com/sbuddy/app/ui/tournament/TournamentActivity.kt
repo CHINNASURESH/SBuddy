@@ -73,6 +73,7 @@ class TournamentActivity : BaseActivity() {
         // Defined in XML
         val inputTournamentName = findViewById<EditText>(R.id.input_tournament_name)
         val inputCategory = findViewById<EditText>(R.id.input_tournament_category)
+        val inputLocation = findViewById<EditText>(R.id.input_tournament_location)
         val checkPublic = findViewById<CheckBox>(R.id.check_public)
         val spinnerType = findViewById<Spinner>(R.id.spinner_tournament_type)
         val radioGroupMode = findViewById<android.widget.RadioGroup>(R.id.radio_group_mode)
@@ -83,7 +84,7 @@ class TournamentActivity : BaseActivity() {
 
         // Init RecyclerView
         recyclerFixtures.layoutManager = LinearLayoutManager(this)
-        fixtureAdapter = FixtureAdapter { match ->
+        fixtureAdapter = FixtureAdapter(onScoreClick = { match ->
             val intent = Intent(this, com.sbuddy.app.ui.scoring.ScoreActivity::class.java)
             intent.putExtra("MATCH_ID", match.id)
             intent.putExtra("MATCH_LABEL", match.matchLabel)
@@ -277,10 +278,12 @@ class TournamentActivity : BaseActivity() {
     private fun saveTournamentInternal(silent: Boolean = false) {
         val txtBracket = findViewById<EditText>(R.id.txt_bracket)
         val inputTournamentName = findViewById<EditText>(R.id.input_tournament_name)
+        val inputLocation = findViewById<EditText>(R.id.input_tournament_location)
         val checkPublic = findViewById<CheckBox>(R.id.check_public)
 
         val bracketText = txtBracket.text.toString()
         val tName = inputTournamentName.text.toString().ifEmpty { "Tournament" }
+        val tLocation = inputLocation.text.toString()
 
         val tournament = Tournament(
             id = currentTournamentId,
@@ -289,7 +292,8 @@ class TournamentActivity : BaseActivity() {
             bracketText = bracketText,
             rounds = rounds,
             isPublic = checkPublic.isChecked,
-            imageUrl = selectedImageUri?.toString() ?: ""
+            imageUrl = selectedImageUri?.toString() ?: "",
+            location = tLocation
         )
 
         lifecycleScope.launch {

@@ -141,6 +141,15 @@
                         android:padding="10dp"
                         android:layout_marginBottom="8dp"/>
 
+                    <EditText
+                        android:id="@+id/input_tournament_location"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="City/Location (e.g. New York)"
+                        android:background="#E0E0E0"
+                        android:padding="10dp"
+                        android:layout_marginBottom="8dp"/>
+
                     <CheckBox
                         android:id="@+id/check_public"
                         android:layout_width="wrap_content"
