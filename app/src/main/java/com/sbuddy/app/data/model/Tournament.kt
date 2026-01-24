@@ -8,5 +8,6 @@ data class Tournament(
     val bracketText: String = "",
     val isPublic: Boolean = false,
     val imageUrl: String = "",
-    val location: String = ""
+    val location: String = "",
+    val status: String = "Open"
 )

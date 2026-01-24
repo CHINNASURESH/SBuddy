@@ -209,11 +209,7 @@ class TournamentActivity : BaseActivity() {
         }
 
         btnPublish.setOnClickListener {
-            val bracketText = txtBracket.text.toString()
-            if (bracketText.isEmpty() || bracketText.contains("Add players")) {
-                Toast.makeText(this, "Generate fixtures first", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
+            // Allow saving without fixtures to enable registration phase
             saveTournamentInternal(silent = false)
         }
 
@@ -285,6 +281,8 @@ class TournamentActivity : BaseActivity() {
         val tName = inputTournamentName.text.toString().ifEmpty { "Tournament" }
         val tLocation = inputLocation.text.toString()
 
+        val status = if (rounds.isNotEmpty()) "In Progress" else "Open"
+
         val tournament = Tournament(
             id = currentTournamentId,
             name = tName,
@@ -293,7 +291,8 @@ class TournamentActivity : BaseActivity() {
             rounds = rounds,
             isPublic = checkPublic.isChecked,
             imageUrl = selectedImageUri?.toString() ?: "",
-            location = tLocation
+            location = tLocation,
+            status = status
         )
 
         lifecycleScope.launch {
@@ -305,7 +304,8 @@ class TournamentActivity : BaseActivity() {
                 }
             } else {
                 if (!silent) {
-                    Toast.makeText(this@TournamentActivity, "Failed to save tournament", Toast.LENGTH_SHORT).show()
+                    val msg = result.exceptionOrNull()?.message ?: "Unknown error"
+                    Toast.makeText(this@TournamentActivity, "Failed to save: $msg", Toast.LENGTH_LONG).show()
                 }
             }
         }
