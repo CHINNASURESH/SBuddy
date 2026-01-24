@@ -9,18 +9,11 @@ class TournamentRepository {
     private val firestore: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
     private val collection = firestore.collection("tournaments")
 
-    val isMockMode: Boolean by lazy {
-        try {
-            FirebaseApp.getInstance().options.projectId == "mock-project-id"
-        } catch (e: Exception) {
-            false
-        }
-    }
+    // Force mock mode off since we expect a real backend now
+    val isMockMode: Boolean = false
 
     suspend fun saveTournament(tournament: Tournament): Result<String> {
-        if (isMockMode) {
-            return Result.success("mock-tournament-id")
-        }
+        // if (isMockMode) { return Result.success("mock-tournament-id") }
         return try {
             // If ID exists, update. If not, create new.
             // Using set() with merge is safer for updates, but since we overwrite the whole object here:
@@ -42,14 +35,15 @@ class TournamentRepository {
     }
 
     suspend fun getPublicTournaments(): Result<List<Tournament>> {
+        /*
         if (isMockMode) {
-            // Return some mock data to verify UI
              val mockData = listOf(
                 Tournament(id = "mock1", name = "Mock Tournament 1", isPublic = true, location = "New York"),
                 Tournament(id = "mock2", name = "Mock Tournament 2", isPublic = true, location = "London")
             )
             return Result.success(mockData)
         }
+        */
         return try {
             val snapshot = collection.whereEqualTo("isPublic", true).get().await()
             var tournaments = snapshot.toObjects(Tournament::class.java)
@@ -65,6 +59,7 @@ class TournamentRepository {
     }
 
     suspend fun getTournament(id: String): Result<Tournament?> {
+        /*
         if (isMockMode) {
             if (id == "mock1") {
                 return Result.success(Tournament(id = "mock1", name = "Mock Tournament 1", isPublic = true, location = "New York"))
@@ -73,6 +68,7 @@ class TournamentRepository {
             }
             return Result.success(null)
         }
+        */
         return try {
             val doc = collection.document(id).get().await()
             if (doc.exists()) {
