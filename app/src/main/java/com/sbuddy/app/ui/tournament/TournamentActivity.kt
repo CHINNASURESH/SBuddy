@@ -9,10 +9,14 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Spinner
+import android.Manifest
+import android.content.pm.PackageManager
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -41,6 +45,7 @@ class TournamentActivity : BaseActivity() {
         private const val REQUEST_IMAGE = 201
         private const val REQUEST_IMPORT = 202
         private const val REQUEST_CREATE_FILE = 203
+        private const val REQUEST_PERMISSION_STORAGE = 102
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,6 +82,11 @@ class TournamentActivity : BaseActivity() {
         val checkPublic = findViewById<CheckBox>(R.id.check_public)
         val spinnerType = findViewById<Spinner>(R.id.spinner_tournament_type)
         val radioGroupMode = findViewById<android.widget.RadioGroup>(R.id.radio_group_mode)
+
+        // Check Auth
+        if (com.google.firebase.auth.FirebaseAuth.getInstance().currentUser == null) {
+            Toast.makeText(this, "You must be logged in to save tournaments.", Toast.LENGTH_LONG).show()
+        }
 
         // Default to Read-Only
         txtBracket.focusable = View.NOT_FOCUSABLE
@@ -234,10 +244,12 @@ class TournamentActivity : BaseActivity() {
         }
 
         btnSelectImage.setOnClickListener {
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-            intent.addCategory(Intent.CATEGORY_OPENABLE)
-            intent.type = "image/*"
-            startActivityForResult(intent, REQUEST_IMAGE)
+            if (checkStoragePermission()) {
+                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+                intent.addCategory(Intent.CATEGORY_OPENABLE)
+                intent.type = "image/*"
+                startActivityForResult(intent, REQUEST_IMAGE)
+            }
         }
 
         btnEdit.setOnClickListener {
@@ -250,11 +262,13 @@ class TournamentActivity : BaseActivity() {
         }
 
         btnImport.setOnClickListener {
-            val intent = Intent(Intent.ACTION_GET_CONTENT)
-            intent.type = "*/*" // Allow all to ensure CSV/Text are picked up easily
-            val mimeTypes = arrayOf("text/csv", "text/comma-separated-values", "text/plain")
-            intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
-            startActivityForResult(intent, REQUEST_IMPORT)
+            if (checkStoragePermission()) {
+                val intent = Intent(Intent.ACTION_GET_CONTENT)
+                intent.type = "*/*"
+                val mimeTypes = arrayOf("text/csv", "text/comma-separated-values", "text/plain")
+                intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
+                startActivityForResult(intent, REQUEST_IMPORT)
+            }
         }
 
         btnDownload.setOnClickListener {
@@ -262,13 +276,28 @@ class TournamentActivity : BaseActivity() {
                 Toast.makeText(this, "No participants to download", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                addCategory(Intent.CATEGORY_OPENABLE)
-                type = "text/csv"
-                putExtra(Intent.EXTRA_TITLE, "participants.csv")
+            if (checkStoragePermission()) {
+                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = "text/csv"
+                    putExtra(Intent.EXTRA_TITLE, "participants.csv")
+                }
+                startActivityForResult(intent, REQUEST_CREATE_FILE)
             }
-            startActivityForResult(intent, REQUEST_CREATE_FILE)
         }
+    }
+
+    private fun checkStoragePermission(): Boolean {
+        // For Android 13+ (SDK 33), READ_MEDIA_IMAGES might be needed, but READ_EXTERNAL_STORAGE is deprecated.
+        // For our purpose of SAF (ACTION_OPEN_DOCUMENT), permissions are granted by URI.
+        // However, if user insists on "Storage Permission", we request legacy ones for compatibility.
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.TIRAMISU) {
+             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                 ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_PERMISSION_STORAGE)
+                 return false
+             }
+        }
+        return true
     }
 
     private fun saveTournamentInternal(silent: Boolean = false) {
