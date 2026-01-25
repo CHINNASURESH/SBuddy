@@ -10,11 +10,13 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import androidx.lifecycle.lifecycleScope
 import com.sbuddy.app.BaseActivity
 import com.sbuddy.app.R
 import com.sbuddy.app.data.model.Match
 import com.sbuddy.app.data.repository.MatchRepository
 import com.sbuddy.app.utils.GameLogic
+import kotlinx.coroutines.launch
 import java.util.Stack
 import java.util.UUID
 
@@ -497,15 +499,19 @@ class ScoreActivity : BaseActivity() {
             isSingles = isSingles,
             matchLabel = matchLabel ?: ""
         )
-        repository.saveMatch(match)
 
-        if (tournamentId != null) {
-            val resultIntent = android.content.Intent()
-            resultIntent.putExtra("MATCH_ID", idToUse)
-            resultIntent.putExtra("WINNER", winner)
-            resultIntent.putExtra("SCORE_P1", scoreP1)
-            resultIntent.putExtra("SCORE_P2", scoreP2)
-            setResult(RESULT_OK, resultIntent)
+        lifecycleScope.launch {
+            repository.saveMatch(match)
+            // We ignore failure here as repository saves locally anyway.
+
+            if (tournamentId != null) {
+                val resultIntent = android.content.Intent()
+                resultIntent.putExtra("MATCH_ID", idToUse)
+                resultIntent.putExtra("WINNER", winner)
+                resultIntent.putExtra("SCORE_P1", scoreP1)
+                resultIntent.putExtra("SCORE_P2", scoreP2)
+                setResult(RESULT_OK, resultIntent)
+            }
         }
     }
 

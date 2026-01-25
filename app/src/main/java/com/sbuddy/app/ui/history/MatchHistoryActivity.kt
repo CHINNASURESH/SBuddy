@@ -3,6 +3,7 @@ package com.sbuddy.app.ui.history
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.tabs.TabLayout
@@ -13,6 +14,7 @@ import com.sbuddy.app.data.repository.MatchRepository
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -37,13 +39,16 @@ class MatchHistoryActivity : BaseActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
 
-        repository.getHistory { matches ->
+        lifecycleScope.launch {
+            val result = repository.getHistory()
+            val matches = result.getOrDefault(emptyList())
+
             // Filter by user if needed (Buddy feature)
             var filtered = matches
             if (!userName.isNullOrEmpty()) {
-                 filtered = matches.filter {
-                     it.player1Name.contains(userName, true) || it.player2Name.contains(userName, true)
-                 }
+                filtered = matches.filter {
+                    it.player1Name.contains(userName, true) || it.player2Name.contains(userName, true)
+                }
             }
             allMatches = filtered
             updateList(adapter)
