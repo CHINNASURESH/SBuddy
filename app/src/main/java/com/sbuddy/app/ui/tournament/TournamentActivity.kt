@@ -310,12 +310,14 @@ class TournamentActivity : BaseActivity() {
         val progressBar = findViewById<android.widget.ProgressBar>(R.id.progress_bar)
         val btnPublish = findViewById<Button>(R.id.btn_publish)
 
-        if (authRepository.getCurrentUser() == null) {
+        val currentUser = authRepository.getCurrentUser()
+        if (currentUser == null) {
             if (!silent) {
                 Toast.makeText(this, "You must be logged in to save tournaments.", Toast.LENGTH_LONG).show()
             }
             return
         }
+        val currentUserId = currentUser.uid
 
         if (!silent) {
             progressBar.visibility = View.VISIBLE
@@ -331,6 +333,8 @@ class TournamentActivity : BaseActivity() {
         val tournament = Tournament(
             id = currentTournamentId,
             name = tName,
+            creatorId = currentUserId,
+            date = System.currentTimeMillis(),
             participants = participants,
             bracketText = bracketText,
             rounds = rounds,
