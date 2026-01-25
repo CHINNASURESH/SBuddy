@@ -1,6 +1,7 @@
 package com.sbuddy.app.utils
 
 import com.sbuddy.app.data.model.Match
+import java.util.UUID
 
 class TournamentManager {
 
@@ -167,8 +168,134 @@ class TournamentManager {
         return sb.toString()
     }
 
-    // Kept for backward compatibility if needed
+    /**
+     * Generates structured List<Match> for the tournament.
+     */
+    fun generateFixturesList(participants: List<String>, type: String, topSeed: String? = null): List<Match> {
+        return if (type == "League") {
+            generateLeagueMatches(participants)
+        } else {
+            generateKnockoutMatches(participants, topSeed)
+        }
+    }
+
+    private data class Slot(val name: String, val sourceMatchId: String? = null)
+
+    private fun generateKnockoutMatches(participants: List<String>, topSeed: String?): List<Match> {
+        val matches = mutableListOf<Match>()
+        if (participants.size < 2) return matches
+
+        val workingList = participants.toMutableList()
+        // Handle seeding: move topSeed to index 0
+        if (topSeed != null && workingList.contains(topSeed)) {
+            workingList.remove(topSeed)
+            workingList.shuffle()
+            workingList.add(0, topSeed)
+        } else {
+            workingList.shuffle()
+        }
+
+        var currentRoundSlots = workingList.map { Slot(it) }
+        var matchGlobalCount = 1
+
+        while (currentRoundSlots.size > 1) {
+            val nextRoundSlots = mutableListOf<Slot>()
+            val matchCount = (currentRoundSlots.size + 1) / 2
+
+            for (i in 0 until matchCount) {
+                val p1Index = i * 2
+                val p2Index = i * 2 + 1
+
+                if (p2Index < currentRoundSlots.size) {
+                    val slot1 = currentRoundSlots[p1Index]
+                    val slot2 = currentRoundSlots[p2Index]
+
+                    val matchId = UUID.randomUUID().toString()
+                    val matchLabel = "M$matchGlobalCount"
+
+                    matches.add(Match(
+                        id = matchId,
+                        matchLabel = matchLabel,
+                        player1Name = slot1.name,
+                        player2Name = slot2.name,
+                        sourceMatchId1 = slot1.sourceMatchId,
+                        sourceMatchId2 = slot2.sourceMatchId,
+                        winner = null
+                    ))
+
+                    nextRoundSlots.add(Slot("Winner $matchLabel", matchId))
+                    matchGlobalCount++
+                } else {
+                    // Bye - passes through
+                    nextRoundSlots.add(currentRoundSlots[p1Index])
+                }
+            }
+            currentRoundSlots = nextRoundSlots
+        }
+        return matches
+    }
+
+    private fun generateLeagueMatches(participants: List<String>): List<Match> {
+        val matches = mutableListOf<Match>()
+        val groupCount = if (participants.size > 5) (participants.size + 3) / 4 else 1
+
+        if (groupCount == 1) {
+            return generateRoundRobinMatches(participants, "League")
+        }
+
+        val shuffled = participants.shuffled()
+        val groups = MutableList(groupCount) { mutableListOf<String>() }
+        shuffled.forEachIndexed { index, p -> groups[index % groupCount].add(p) }
+
+        groups.forEachIndexed { index, groupMembers ->
+            val groupName = (65 + index).toChar().toString()
+            matches.addAll(generateRoundRobinMatches(groupMembers, "Group $groupName"))
+        }
+
+        return matches
+    }
+
+    private fun generateRoundRobinMatches(participants: List<String>, contextName: String): List<Match> {
+        val matches = mutableListOf<Match>()
+        if (participants.size < 2) return matches
+
+        val players = participants.toMutableList()
+        if (players.size % 2 != 0) {
+            players.add("BYE")
+        }
+
+        val numRounds = players.size - 1
+        val halfSize = players.size / 2
+        var matchGlobalCount = 1
+        val teamSize = players.size
+
+        for (round in 0 until numRounds) {
+            for (i in 0 until halfSize) {
+                val p1 = players[i]
+                val p2 = players[teamSize - 1 - i]
+
+                if (p1 != "BYE" && p2 != "BYE") {
+                    val matchId = UUID.randomUUID().toString()
+                    val label = "$contextName M$matchGlobalCount"
+
+                    matches.add(Match(
+                        id = matchId,
+                        matchLabel = label,
+                        player1Name = p1,
+                        player2Name = p2
+                    ))
+                    matchGlobalCount++
+                }
+            }
+            // Rotate
+            val last = players.removeAt(players.size - 1)
+            players.add(1, last)
+        }
+        return matches
+    }
+
+    // Deprecated
     fun generateFixtures(participants: List<String>): List<Match> {
-        return emptyList()
+        return generateFixturesList(participants, "Knockout")
     }
 }

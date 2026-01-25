@@ -10,9 +10,11 @@ import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
 import com.sbuddy.app.ui.scoring.MatchSetupActivity
 import com.sbuddy.app.ui.history.MatchHistoryActivity
-import com.sbuddy.app.ui.tournament.TournamentActivity
+import com.sbuddy.app.ui.tournament.PublicTournamentsActivity
 import com.sbuddy.app.ui.group.BuddyGroupActivity
 import com.sbuddy.app.ui.profile.UserProfileActivity
+import com.sbuddy.app.data.repository.AuthRepository
+import android.widget.Toast
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -21,6 +23,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // Check for Mock Mode and warn user
+        if (AuthRepository().isMockMode) {
+            Toast.makeText(this, "⚠️ Running in Mock Mode. Replace google-services.json to use Real Firestore.", Toast.LENGTH_LONG).show()
+        }
 
         val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -47,7 +54,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
 
         findViewById<android.view.View>(R.id.card_tournaments).setOnClickListener {
-            startActivity(Intent(this, TournamentActivity::class.java))
+            startActivity(Intent(this, PublicTournamentsActivity::class.java))
         }
 
         findViewById<android.view.View>(R.id.card_buddy_groups).setOnClickListener {
@@ -85,7 +92,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 startActivity(Intent(this, MatchHistoryActivity::class.java))
             }
             R.id.nav_tournaments -> {
-                startActivity(Intent(this, TournamentActivity::class.java))
+                startActivity(Intent(this, PublicTournamentsActivity::class.java))
             }
             R.id.nav_buddy_groups -> {
                 startActivity(Intent(this, BuddyGroupActivity::class.java))

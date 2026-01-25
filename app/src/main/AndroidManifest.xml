@@ -4,6 +4,10 @@
 
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
 
     <application
         android:allowBackup="true"
@@ -28,6 +32,7 @@
             android:name=".ui.tournament.TournamentActivity"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ui.tournament.PublicTournamentsActivity" />
+        <activity android:name=".ui.tournament.TournamentDetailActivity" />
         <activity android:name=".ui.group.BuddyGroupActivity" />
         <activity android:name=".ui.group.GroupDetailActivity" />
         <activity android:name=".ui.profile.UserProfileActivity" />

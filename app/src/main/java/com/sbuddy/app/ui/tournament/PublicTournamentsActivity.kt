@@ -1,11 +1,15 @@
 package com.sbuddy.app.ui.tournament
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,38 +23,63 @@ class PublicTournamentsActivity : BaseActivity() {
 
     private val tournamentRepository = TournamentRepository()
     private lateinit var adapter: TournamentAdapter
+    private val REQUEST_PERMISSIONS = 101
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_public_tournaments)
 
+        checkPermissions()
+
         val recyclerView = findViewById<RecyclerView>(R.id.recycler_view_tournaments)
         recyclerView.layoutManager = LinearLayoutManager(this)
         adapter = TournamentAdapter { tournament ->
-            showBracketDialog(tournament)
+            val intent = android.content.Intent(this, TournamentDetailActivity::class.java)
+            intent.putExtra("TOURNAMENT_ID", tournament.id)
+            startActivity(intent)
         }
         recyclerView.adapter = adapter
 
+        loadTournaments()
+
+        findViewById<View>(R.id.fab_create_tournament).setOnClickListener {
+            startActivity(android.content.Intent(this, TournamentActivity::class.java))
+        }
+    }
+
+    private fun checkPermissions() {
+        val permissions = arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+        val needed = permissions.filter {
+            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+        }
+        if (needed.isNotEmpty()) {
+            ActivityCompat.requestPermissions(this, needed.toTypedArray(), REQUEST_PERMISSIONS)
+        }
+    }
+
+    private fun loadTournaments() {
         lifecycleScope.launch {
             val result = tournamentRepository.getPublicTournaments()
             if (result.isSuccess) {
                 val tournaments = result.getOrNull() ?: emptyList()
                 adapter.setTournaments(tournaments)
+                if (tournaments.isEmpty()) {
+                    Toast.makeText(this@PublicTournamentsActivity, "No public tournaments found", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(this@PublicTournamentsActivity, "Error loading tournaments: ${result.exceptionOrNull()?.message}", Toast.LENGTH_LONG).show()
             }
         }
     }
 
-    private fun showBracketDialog(tournament: Tournament) {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle(tournament.name)
-
-        // Show bracket text
-        val message = if (tournament.bracketText.isNotEmpty()) tournament.bracketText else "No fixtures generated."
-
-        builder.setMessage(message)
-        builder.setPositiveButton("Close", null)
-        builder.show()
+    override fun onResume() {
+        super.onResume()
+        loadTournaments()
     }
+
 }
 
 class TournamentAdapter(private val onItemClick: (Tournament) -> Unit) : RecyclerView.Adapter<TournamentAdapter.ViewHolder>() {
@@ -77,10 +106,19 @@ class TournamentAdapter(private val onItemClick: (Tournament) -> Unit) : Recycle
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val nameView: TextView = itemView.findViewById(R.id.text_tournament_name)
         private val countView: TextView = itemView.findViewById(R.id.text_participants_count)
+        private val locView: TextView = itemView.findViewById(R.id.text_tournament_location)
 
         fun bind(tournament: Tournament, onItemClick: (Tournament) -> Unit) {
             nameView.text = tournament.name
             countView.text = "Participants: ${tournament.participants.size}"
+
+            if (tournament.location.isNotEmpty()) {
+                locView.visibility = View.VISIBLE
+                locView.text = "📍 ${tournament.location}"
+            } else {
+                locView.visibility = View.GONE
+            }
+
             itemView.setOnClickListener { onItemClick(tournament) }
         }
     }

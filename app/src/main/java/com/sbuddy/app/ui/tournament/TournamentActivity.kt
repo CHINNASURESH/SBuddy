@@ -2,18 +2,29 @@ package com.sbuddy.app.ui.tournament
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Spinner
+import android.Manifest
+import android.content.pm.PackageManager
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.sbuddy.app.BaseActivity
 import com.sbuddy.app.R
+import com.sbuddy.app.data.model.Match
 import com.sbuddy.app.data.model.Tournament
+import com.sbuddy.app.data.repository.AuthRepository
 import com.sbuddy.app.data.repository.TournamentRepository
 import com.sbuddy.app.utils.TournamentManager
 import kotlinx.coroutines.launch
@@ -23,14 +34,20 @@ class TournamentActivity : BaseActivity() {
     private val participants = mutableListOf<String>()
     private val tournamentManager = TournamentManager()
     private val tournamentRepository = TournamentRepository()
+    private val authRepository = AuthRepository()
     private var topSeed: String? = null
     private var selectedImageUri: android.net.Uri? = null
     private var currentTournamentId: String = ""
+
+    private val rounds = mutableListOf<Match>()
+    private lateinit var fixtureAdapter: FixtureAdapter
+    private lateinit var scoreLauncher: ActivityResultLauncher<Intent>
 
     companion object {
         private const val REQUEST_IMAGE = 201
         private const val REQUEST_IMPORT = 202
         private const val REQUEST_CREATE_FILE = 203
+        private const val REQUEST_PERMISSION_STORAGE = 102
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,16 +72,59 @@ class TournamentActivity : BaseActivity() {
         val btnImport = findViewById<ImageButton>(R.id.btn_import_excel)
         val btnDownload = findViewById<ImageButton>(R.id.btn_download_excel)
 
-        // Defined in XML, was missing here causing crash
+        // New UI
+        val scrollBracket = findViewById<View>(R.id.scroll_bracket_text)
+        val recyclerFixtures = findViewById<RecyclerView>(R.id.recycler_fixtures)
+        val btnToggle = findViewById<ImageButton>(R.id.btn_toggle_view)
+
+        // Defined in XML
         val inputTournamentName = findViewById<EditText>(R.id.input_tournament_name)
         val inputCategory = findViewById<EditText>(R.id.input_tournament_category)
+        val inputLocation = findViewById<EditText>(R.id.input_tournament_location)
         val checkPublic = findViewById<CheckBox>(R.id.check_public)
         val spinnerType = findViewById<Spinner>(R.id.spinner_tournament_type)
         val radioGroupMode = findViewById<android.widget.RadioGroup>(R.id.radio_group_mode)
 
+        // Check Auth
+        if (authRepository.getCurrentUser() == null) {
+            Toast.makeText(this, "You must be logged in to save tournaments.", Toast.LENGTH_LONG).show()
+        }
+
         // Default to Read-Only
-        txtBracket.focusable = android.view.View.NOT_FOCUSABLE
+        txtBracket.focusable = View.NOT_FOCUSABLE
         txtBracket.isFocusableInTouchMode = false
+
+        // Init RecyclerView
+        recyclerFixtures.layoutManager = LinearLayoutManager(this)
+        fixtureAdapter = FixtureAdapter(onScoreClick = { match ->
+            val intent = Intent(this, com.sbuddy.app.ui.scoring.ScoreActivity::class.java)
+            intent.putExtra("MATCH_ID", match.id)
+            intent.putExtra("MATCH_LABEL", match.matchLabel)
+            intent.putExtra("TOURNAMENT_ID", currentTournamentId.ifEmpty { "TEMP_ID" })
+            intent.putExtra("MAX_SCORE", 21) // Default
+
+            intent.putExtra("TEAM_1_NAME", match.player1Name)
+            intent.putExtra("TEAM_2_NAME", match.player2Name)
+
+            intent.putExtra("IS_SINGLES", radioGroupMode.checkedRadioButtonId == R.id.radio_singles)
+
+            scoreLauncher.launch(intent)
+        })
+        recyclerFixtures.adapter = fixtureAdapter
+
+        // Init Score Launcher
+        scoreLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK && result.data != null) {
+                val matchId = result.data?.getStringExtra("MATCH_ID")
+                val winner = result.data?.getStringExtra("WINNER")
+                val s1 = result.data?.getIntExtra("SCORE_P1", 0) ?: 0
+                val s2 = result.data?.getIntExtra("SCORE_P2", 0) ?: 0
+
+                if (matchId != null && winner != null) {
+                    updateMatchResult(matchId, winner, s1, s2)
+                }
+            }
+        }
 
         // Setup Spinner
         val adapter = ArrayAdapter(
@@ -77,11 +137,23 @@ class TournamentActivity : BaseActivity() {
 
         radioGroupMode.setOnCheckedChangeListener { _, checkedId ->
             if (checkedId == R.id.radio_doubles) {
-                inputName2.visibility = android.view.View.VISIBLE
+                inputName2.visibility = View.VISIBLE
                 inputName.hint = "Player 1 Name"
             } else {
-                inputName2.visibility = android.view.View.GONE
+                inputName2.visibility = View.GONE
                 inputName.hint = "Player Name"
+            }
+        }
+
+        btnToggle.setOnClickListener {
+            if (recyclerFixtures.visibility == View.VISIBLE) {
+                recyclerFixtures.visibility = View.GONE
+                scrollBracket.visibility = View.VISIBLE
+                Toast.makeText(this, "Text View", Toast.LENGTH_SHORT).show()
+            } else {
+                recyclerFixtures.visibility = View.VISIBLE
+                scrollBracket.visibility = View.GONE
+                Toast.makeText(this, "Interactive View", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -128,41 +200,29 @@ class TournamentActivity : BaseActivity() {
             }
 
             val selectedType = spinnerType.selectedItem as String
+
+            // Text Generation
             val bracketText = if (selectedType == "League") {
                 tournamentManager.generateLeagueText(participants)
             } else {
                 tournamentManager.generateBracketText(participants, topSeed)
             }
-
             txtBracket.setText(bracketText)
+
+            // List Generation
+            val generatedRounds = tournamentManager.generateFixturesList(participants, selectedType, topSeed)
+            rounds.clear()
+            rounds.addAll(generatedRounds)
+            fixtureAdapter.setMatches(rounds)
+
+            // Switch to List View
+            recyclerFixtures.visibility = View.VISIBLE
+            scrollBracket.visibility = View.GONE
         }
 
         btnPublish.setOnClickListener {
-            val bracketText = txtBracket.text.toString()
-            if (bracketText.isEmpty() || bracketText.contains("Add players")) {
-                Toast.makeText(this, "Generate fixtures first", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val tName = inputTournamentName.text.toString().ifEmpty { "Tournament" }
-            val tournament = Tournament(
-                id = currentTournamentId,
-                name = tName,
-                participants = participants,
-                bracketText = bracketText,
-                isPublic = checkPublic.isChecked,
-                imageUrl = selectedImageUri?.toString() ?: ""
-            )
-
-            lifecycleScope.launch {
-                val result = tournamentRepository.saveTournament(tournament)
-                if (result.isSuccess) {
-                    currentTournamentId = result.getOrNull() ?: currentTournamentId
-                    Toast.makeText(this@TournamentActivity, "Tournament Saved/Published!", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this@TournamentActivity, "Failed to save tournament", Toast.LENGTH_SHORT).show()
-                }
-            }
+            // Allow saving without fixtures to enable registration phase
+            saveTournamentInternal(silent = false)
         }
 
         btnViewPublic.setOnClickListener {
@@ -186,14 +246,16 @@ class TournamentActivity : BaseActivity() {
         }
 
         btnSelectImage.setOnClickListener {
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-            intent.addCategory(Intent.CATEGORY_OPENABLE)
-            intent.type = "image/*"
-            startActivityForResult(intent, REQUEST_IMAGE)
+            if (checkStoragePermission()) {
+                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+                intent.addCategory(Intent.CATEGORY_OPENABLE)
+                intent.type = "image/*"
+                startActivityForResult(intent, REQUEST_IMAGE)
+            }
         }
 
         btnEdit.setOnClickListener {
-            txtBracket.focusable = android.view.View.FOCUSABLE
+            txtBracket.focusable = View.FOCUSABLE
             txtBracket.isFocusableInTouchMode = true
             txtBracket.requestFocus()
             val imm = getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
@@ -202,11 +264,13 @@ class TournamentActivity : BaseActivity() {
         }
 
         btnImport.setOnClickListener {
-            val intent = Intent(Intent.ACTION_GET_CONTENT)
-            intent.type = "*/*" // Allow all to ensure CSV/Text are picked up easily
-            val mimeTypes = arrayOf("text/csv", "text/comma-separated-values", "text/plain")
-            intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
-            startActivityForResult(intent, REQUEST_IMPORT)
+            if (checkStoragePermission()) {
+                val intent = Intent(Intent.ACTION_GET_CONTENT)
+                intent.type = "*/*"
+                val mimeTypes = arrayOf("text/csv", "text/comma-separated-values", "text/plain")
+                intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
+                startActivityForResult(intent, REQUEST_IMPORT)
+            }
         }
 
         btnDownload.setOnClickListener {
@@ -214,12 +278,128 @@ class TournamentActivity : BaseActivity() {
                 Toast.makeText(this, "No participants to download", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                addCategory(Intent.CATEGORY_OPENABLE)
-                type = "text/csv"
-                putExtra(Intent.EXTRA_TITLE, "participants.csv")
+            if (checkStoragePermission()) {
+                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = "text/csv"
+                    putExtra(Intent.EXTRA_TITLE, "participants.csv")
+                }
+                startActivityForResult(intent, REQUEST_CREATE_FILE)
             }
-            startActivityForResult(intent, REQUEST_CREATE_FILE)
+        }
+    }
+
+    private fun checkStoragePermission(): Boolean {
+        // For Android 13+ (SDK 33), READ_MEDIA_IMAGES might be needed, but READ_EXTERNAL_STORAGE is deprecated.
+        // For our purpose of SAF (ACTION_OPEN_DOCUMENT), permissions are granted by URI.
+        // However, if user insists on "Storage Permission", we request legacy ones for compatibility.
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.TIRAMISU) {
+             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                 ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_PERMISSION_STORAGE)
+                 return false
+             }
+        }
+        return true
+    }
+
+    private fun saveTournamentInternal(silent: Boolean = false) {
+        val txtBracket = findViewById<EditText>(R.id.txt_bracket)
+        val inputTournamentName = findViewById<EditText>(R.id.input_tournament_name)
+        val inputLocation = findViewById<EditText>(R.id.input_tournament_location)
+        val checkPublic = findViewById<CheckBox>(R.id.check_public)
+        val progressBar = findViewById<android.widget.ProgressBar>(R.id.progress_bar)
+        val btnPublish = findViewById<Button>(R.id.btn_publish)
+
+        if (authRepository.getCurrentUser() == null) {
+            if (!silent) {
+                Toast.makeText(this, "You must be logged in to save tournaments.", Toast.LENGTH_LONG).show()
+            }
+            return
+        }
+
+        if (!silent) {
+            progressBar.visibility = View.VISIBLE
+            btnPublish.isEnabled = false
+        }
+
+        val bracketText = txtBracket.text.toString()
+        val tName = inputTournamentName.text.toString().ifEmpty { "Tournament" }
+        val tLocation = inputLocation.text.toString()
+
+        val status = if (rounds.isNotEmpty()) "In Progress" else "Open"
+
+        val tournament = Tournament(
+            id = currentTournamentId,
+            name = tName,
+            participants = participants,
+            bracketText = bracketText,
+            rounds = rounds,
+            isPublic = checkPublic.isChecked,
+            imageUrl = selectedImageUri?.toString() ?: "",
+            location = tLocation,
+            status = status
+        )
+
+        lifecycleScope.launch {
+            val result = tournamentRepository.saveTournament(tournament)
+            if (!silent) {
+                progressBar.visibility = View.GONE
+                btnPublish.isEnabled = true
+            }
+
+            if (result.isSuccess) {
+                currentTournamentId = result.getOrNull() ?: currentTournamentId
+                if (!silent) {
+                    Toast.makeText(this@TournamentActivity, "Tournament Saved!", Toast.LENGTH_SHORT).show()
+                    finish() // Close activity on success
+                }
+            } else {
+                if (!silent) {
+                    val msg = result.exceptionOrNull()?.message ?: "Unknown error"
+                    Toast.makeText(this@TournamentActivity, "Failed to save: $msg", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    private fun updateMatchResult(matchId: String, winner: String, s1: Int, s2: Int) {
+        val index = rounds.indexOfFirst { it.id == matchId }
+        if (index != -1) {
+            val oldMatch = rounds[index]
+            val newMatch = oldMatch.copy(
+                winner = winner,
+                player1Score = s1,
+                player2Score = s2
+            )
+            rounds[index] = newMatch
+
+            // Progression Logic using source IDs
+            for (i in rounds.indices) {
+                val m = rounds[i]
+                var updated = false
+                var p1 = m.player1Name
+                var p2 = m.player2Name
+
+                if (m.sourceMatchId1 == matchId) {
+                    p1 = winner
+                    updated = true
+                }
+                if (m.sourceMatchId2 == matchId) {
+                    p2 = winner
+                    updated = true
+                }
+
+                if (updated) {
+                    rounds[i] = m.copy(player1Name = p1, player2Name = p2)
+                }
+            }
+
+            fixtureAdapter.setMatches(rounds)
+
+            // Auto-save silently
+            if (currentTournamentId.isNotEmpty()) {
+                saveTournamentInternal(silent = true)
+            }
         }
     }
 
@@ -233,10 +413,9 @@ class TournamentActivity : BaseActivity() {
                     val imgPreview = findViewById<android.widget.ImageView>(R.id.img_tournament_preview)
 
                     statusText.text = "Image Selected"
-                    imgPreview.visibility = android.view.View.VISIBLE
+                    imgPreview.visibility = View.VISIBLE
                     imgPreview.setImageURI(selectedImageUri)
 
-                    // Persist permission so we can read it later
                     selectedImageUri?.let { uri ->
                         try {
                             contentResolver.takePersistableUriPermission(
@@ -244,7 +423,7 @@ class TournamentActivity : BaseActivity() {
                                 Intent.FLAG_GRANT_READ_URI_PERMISSION
                             )
                         } catch (e: Exception) {
-                            // Ignored if not possible
+                            // Ignored
                         }
                     }
                 }
@@ -256,7 +435,7 @@ class TournamentActivity : BaseActivity() {
                                 var line = reader.readLine()
                                 var count = 0
                                 while (line != null) {
-                                    val name = line.trim().replace(",", "") // Simple cleanup
+                                    val name = line.trim().replace(",", "")
                                     if (name.isNotEmpty() && !participants.contains(name)) {
                                         participants.add(name)
                                         count++
