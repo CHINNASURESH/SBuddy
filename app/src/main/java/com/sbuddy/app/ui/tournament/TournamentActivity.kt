@@ -24,6 +24,7 @@ import com.sbuddy.app.BaseActivity
 import com.sbuddy.app.R
 import com.sbuddy.app.data.model.Match
 import com.sbuddy.app.data.model.Tournament
+import com.sbuddy.app.data.repository.AuthRepository
 import com.sbuddy.app.data.repository.TournamentRepository
 import com.sbuddy.app.utils.TournamentManager
 import kotlinx.coroutines.launch
@@ -33,6 +34,7 @@ class TournamentActivity : BaseActivity() {
     private val participants = mutableListOf<String>()
     private val tournamentManager = TournamentManager()
     private val tournamentRepository = TournamentRepository()
+    private val authRepository = AuthRepository()
     private var topSeed: String? = null
     private var selectedImageUri: android.net.Uri? = null
     private var currentTournamentId: String = ""
@@ -84,7 +86,7 @@ class TournamentActivity : BaseActivity() {
         val radioGroupMode = findViewById<android.widget.RadioGroup>(R.id.radio_group_mode)
 
         // Check Auth
-        if (com.google.firebase.auth.FirebaseAuth.getInstance().currentUser == null) {
+        if (authRepository.getCurrentUser() == null) {
             Toast.makeText(this, "You must be logged in to save tournaments.", Toast.LENGTH_LONG).show()
         }
 
@@ -308,7 +310,7 @@ class TournamentActivity : BaseActivity() {
         val progressBar = findViewById<android.widget.ProgressBar>(R.id.progress_bar)
         val btnPublish = findViewById<Button>(R.id.btn_publish)
 
-        if (com.google.firebase.auth.FirebaseAuth.getInstance().currentUser == null) {
+        if (authRepository.getCurrentUser() == null) {
             if (!silent) {
                 Toast.makeText(this, "You must be logged in to save tournaments.", Toast.LENGTH_LONG).show()
             }
