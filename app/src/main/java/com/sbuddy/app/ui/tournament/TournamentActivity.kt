@@ -305,6 +305,13 @@ class TournamentActivity : BaseActivity() {
         val inputTournamentName = findViewById<EditText>(R.id.input_tournament_name)
         val inputLocation = findViewById<EditText>(R.id.input_tournament_location)
         val checkPublic = findViewById<CheckBox>(R.id.check_public)
+        val progressBar = findViewById<android.widget.ProgressBar>(R.id.progress_bar)
+        val btnPublish = findViewById<Button>(R.id.btn_publish)
+
+        if (!silent) {
+            progressBar.visibility = View.VISIBLE
+            btnPublish.isEnabled = false
+        }
 
         val bracketText = txtBracket.text.toString()
         val tName = inputTournamentName.text.toString().ifEmpty { "Tournament" }
@@ -326,10 +333,16 @@ class TournamentActivity : BaseActivity() {
 
         lifecycleScope.launch {
             val result = tournamentRepository.saveTournament(tournament)
+            if (!silent) {
+                progressBar.visibility = View.GONE
+                btnPublish.isEnabled = true
+            }
+
             if (result.isSuccess) {
                 currentTournamentId = result.getOrNull() ?: currentTournamentId
                 if (!silent) {
-                    Toast.makeText(this@TournamentActivity, "Tournament Saved/Published!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@TournamentActivity, "Tournament Saved!", Toast.LENGTH_SHORT).show()
+                    finish() // Close activity on success
                 }
             } else {
                 if (!silent) {
