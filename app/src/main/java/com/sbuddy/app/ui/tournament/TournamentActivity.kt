@@ -308,6 +308,13 @@ class TournamentActivity : BaseActivity() {
         val progressBar = findViewById<android.widget.ProgressBar>(R.id.progress_bar)
         val btnPublish = findViewById<Button>(R.id.btn_publish)
 
+        if (com.google.firebase.auth.FirebaseAuth.getInstance().currentUser == null) {
+            if (!silent) {
+                Toast.makeText(this, "You must be logged in to save tournaments.", Toast.LENGTH_LONG).show()
+            }
+            return
+        }
+
         if (!silent) {
             progressBar.visibility = View.VISIBLE
             btnPublish.isEnabled = false
