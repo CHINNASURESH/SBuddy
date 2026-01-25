@@ -13,6 +13,8 @@ import com.sbuddy.app.ui.history.MatchHistoryActivity
 import com.sbuddy.app.ui.tournament.PublicTournamentsActivity
 import com.sbuddy.app.ui.group.BuddyGroupActivity
 import com.sbuddy.app.ui.profile.UserProfileActivity
+import com.sbuddy.app.data.repository.AuthRepository
+import android.widget.Toast
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -21,6 +23,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // Check for Mock Mode and warn user
+        if (AuthRepository().isMockMode) {
+            Toast.makeText(this, "⚠️ Running in Mock Mode. Replace google-services.json to use Real Firestore.", Toast.LENGTH_LONG).show()
+        }
 
         val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
