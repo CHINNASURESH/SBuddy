@@ -1,11 +1,14 @@
 package com.sbuddy.app.data.repository
 
 import android.content.Context
+import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.sbuddy.app.data.model.Match
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withTimeout
 
 class MatchRepository(private val context: Context) {
 
@@ -13,6 +16,14 @@ class MatchRepository(private val context: Context) {
     private val PREFS_NAME = "sbuddy_prefs"
     private val KEY_MATCH_HISTORY = "match_history"
     private val gson = Gson()
+
+    val isMockMode: Boolean by lazy {
+        try {
+            FirebaseApp.getInstance().options.projectId == "mock-project-id"
+        } catch (e: Exception) {
+            false
+        }
+    }
 
     companion object {
         // Fallback in-memory list if context fails or first run
@@ -55,24 +66,52 @@ class MatchRepository(private val context: Context) {
         editor.apply()
     }
 
-    fun saveMatch(match: Match) {
+    suspend fun saveMatch(match: Match): Result<Unit> {
+        // Always save locally first as backup/cache
         matches.add(0, match) // Add to top
         saveMatches()
 
-        db.collection("matches").add(match)
+        if (isMockMode) {
+            return Result.success(Unit)
+        }
+
+        return try {
+            withTimeout(10000L) {
+                db.collection("matches").add(match).await()
+                Result.success(Unit)
+            }
+        } catch (e: Exception) {
+            // Log error but treat as success from UI perspective since we saved locally?
+            // Or return failure to let UI know cloud sync failed.
+            // For now, return failure but UI should know local save worked.
+            Result.failure(e)
+        }
     }
 
-    fun getHistory(callback: (List<Match>) -> Unit) {
-        db.collection("matches")
-            .orderBy("timestamp", Query.Direction.DESCENDING)
-            .get()
-            .addOnSuccessListener { result ->
+    suspend fun getHistory(): Result<List<Match>> {
+        if (isMockMode) {
+            return Result.success(matches)
+        }
+
+        return try {
+            withTimeout(10000L) {
+                val result = db.collection("matches")
+                    .orderBy("timestamp", Query.Direction.DESCENDING)
+                    .get()
+                    .await()
                 val matchList = result.toObjects(Match::class.java)
-                callback(matchList)
+
+                // Update local cache if cloud fetch succeeds
+                if (matchList.isNotEmpty()) {
+                    matches = matchList.toMutableList()
+                    saveMatches()
+                }
+
+                Result.success(matchList)
             }
-            .addOnFailureListener {
-                // Fallback to local history
-                callback(matches)
-            }
+        } catch (e: Exception) {
+            // Fallback to local history
+            Result.success(matches)
+        }
     }
 }
