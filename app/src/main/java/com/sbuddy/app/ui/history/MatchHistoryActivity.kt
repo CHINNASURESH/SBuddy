@@ -34,24 +34,47 @@ class MatchHistoryActivity : BaseActivity() {
         val userName = intent.getStringExtra("USER_NAME")
         val recyclerView = findViewById<RecyclerView>(R.id.recycler_history)
         val tabLayout = findViewById<TabLayout>(R.id.tab_layout)
+        val progressBar = findViewById<android.widget.ProgressBar>(R.id.progress_bar)
+        val txtError = findViewById<TextView>(R.id.txt_error)
 
         val adapter = MatchHistoryAdapter(emptyList())
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
 
+        // Initial State
+        progressBar.visibility = View.VISIBLE
+        recyclerView.visibility = View.GONE
+        txtError.visibility = View.GONE
+
         lifecycleScope.launch {
             val result = repository.getHistory()
-            val matches = result.getOrDefault(emptyList())
+            progressBar.visibility = View.GONE
 
-            // Filter by user if needed (Buddy feature)
-            var filtered = matches
-            if (!userName.isNullOrEmpty()) {
-                filtered = matches.filter {
-                    it.player1Name.contains(userName, true) || it.player2Name.contains(userName, true)
+            if (result.isSuccess) {
+                val matches = result.getOrDefault(emptyList())
+                // Filter by user if needed (Buddy feature)
+                var filtered = matches
+                if (!userName.isNullOrEmpty()) {
+                    filtered = matches.filter {
+                        it.player1Name.contains(userName, true) || it.player2Name.contains(userName, true)
+                    }
                 }
+                allMatches = filtered
+
+                if (allMatches.isEmpty()) {
+                    txtError.text = "No match history found."
+                    txtError.visibility = View.VISIBLE
+                    recyclerView.visibility = View.GONE
+                } else {
+                    recyclerView.visibility = View.VISIBLE
+                    txtError.visibility = View.GONE
+                    updateList(adapter)
+                }
+            } else {
+                txtError.text = "Couldn't load data. Please try again."
+                txtError.visibility = View.VISIBLE
+                recyclerView.visibility = View.GONE
             }
-            allMatches = filtered
-            updateList(adapter)
         }
 
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {

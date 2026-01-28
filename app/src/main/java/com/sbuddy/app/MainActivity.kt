@@ -13,28 +13,25 @@ import com.sbuddy.app.ui.history.MatchHistoryActivity
 import com.sbuddy.app.ui.tournament.PublicTournamentsActivity
 import com.sbuddy.app.ui.group.BuddyGroupActivity
 import com.sbuddy.app.ui.profile.UserProfileActivity
-import com.sbuddy.app.data.repository.AuthRepository
-import android.widget.Toast
+import com.sbuddy.app.databinding.ActivityMainBinding
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        // Check for Mock Mode and warn user
-        if (AuthRepository().isMockMode) {
-            Toast.makeText(this, "⚠️ Running in Mock Mode. Replace google-services.json to use Real Firestore.", Toast.LENGTH_LONG).show()
-        }
-
-        val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
+        // Revert risky ViewBinding access for nested layouts (app_bar_main/content_main) without seeing XML.
+        // Use safe findViewById on binding.root or direct access.
+        val toolbar: androidx.appcompat.widget.Toolbar = binding.root.findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        drawerLayout = findViewById(R.id.drawer_layout)
-        val navView: NavigationView = findViewById(R.id.nav_view)
+        val drawerLayout = binding.drawerLayout
+        val navView = binding.navView
 
         val toggle = ActionBarDrawerToggle(
             this, drawerLayout, toolbar, R.string.app_name, R.string.app_name
@@ -45,19 +42,19 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         navView.setNavigationItemSelectedListener(this)
 
         // Card Clicks
-        findViewById<android.view.View>(R.id.card_new_game).setOnClickListener {
+        binding.root.findViewById<android.view.View>(R.id.card_new_game).setOnClickListener {
             startActivity(Intent(this, MatchSetupActivity::class.java))
         }
 
-        findViewById<android.view.View>(R.id.card_history).setOnClickListener {
+        binding.root.findViewById<android.view.View>(R.id.card_history).setOnClickListener {
             startActivity(Intent(this, MatchHistoryActivity::class.java))
         }
 
-        findViewById<android.view.View>(R.id.card_tournaments).setOnClickListener {
+        binding.root.findViewById<android.view.View>(R.id.card_tournaments).setOnClickListener {
             startActivity(Intent(this, PublicTournamentsActivity::class.java))
         }
 
-        findViewById<android.view.View>(R.id.card_buddy_groups).setOnClickListener {
+        binding.root.findViewById<android.view.View>(R.id.card_buddy_groups).setOnClickListener {
             startActivity(Intent(this, BuddyGroupActivity::class.java))
         }
 
@@ -106,8 +103,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     override fun onBackPressed() {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START)
+        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            binding.drawerLayout.closeDrawer(GravityCompat.START)
         } else {
             super.onBackPressed()
         }
