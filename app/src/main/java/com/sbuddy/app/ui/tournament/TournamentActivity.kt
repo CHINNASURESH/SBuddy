@@ -306,6 +306,8 @@ class TournamentActivity : BaseActivity() {
         val txtBracket = findViewById<EditText>(R.id.txt_bracket)
         val inputTournamentName = findViewById<EditText>(R.id.input_tournament_name)
         val inputLocation = findViewById<EditText>(R.id.input_tournament_location)
+        val inputCourtName = findViewById<EditText>(R.id.input_court_name)
+        val inputOrganizerMobile = findViewById<EditText>(R.id.input_organizer_mobile)
         val checkPublic = findViewById<CheckBox>(R.id.check_public)
         val progressBar = findViewById<android.widget.ProgressBar>(R.id.progress_bar)
         val btnPublish = findViewById<Button>(R.id.btn_publish)
@@ -327,6 +329,8 @@ class TournamentActivity : BaseActivity() {
         val bracketText = txtBracket.text.toString()
         val tName = inputTournamentName.text.toString().ifEmpty { "Tournament" }
         val tLocation = inputLocation.text.toString()
+        val tCourt = inputCourtName.text.toString()
+        val tMobile = inputOrganizerMobile.text.toString()
 
         val status = if (rounds.isNotEmpty()) "In Progress" else "Open"
 
@@ -335,6 +339,8 @@ class TournamentActivity : BaseActivity() {
             name = tName,
             creatorId = currentUserId,
             date = System.currentTimeMillis(),
+            organizerMobile = tMobile,
+            courtName = tCourt,
             participants = participants,
             bracketText = bracketText,
             rounds = rounds,
@@ -355,7 +361,10 @@ class TournamentActivity : BaseActivity() {
                 currentTournamentId = result.getOrNull() ?: currentTournamentId
                 if (!silent) {
                     Toast.makeText(this@TournamentActivity, "Tournament Saved!", Toast.LENGTH_SHORT).show()
-                    finish() // Close activity on success
+                    val intent = Intent(this@TournamentActivity, TournamentDetailActivity::class.java)
+                    intent.putExtra("TOURNAMENT_ID", currentTournamentId)
+                    startActivity(intent)
+                    finish()
                 }
             } else {
                 if (!silent) {

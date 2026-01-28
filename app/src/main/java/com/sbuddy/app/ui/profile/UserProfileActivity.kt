@@ -25,6 +25,7 @@ class UserProfileActivity : BaseActivity() {
         val inputMobile = findViewById<EditText>(R.id.profile_mobile)
         val btnSave = findViewById<Button>(R.id.btn_save_profile)
         val btnResetPass = findViewById<Button>(R.id.btn_reset_password)
+        val btnLogout = findViewById<Button>(R.id.btn_logout)
         val radioGroupTheme = findViewById<RadioGroup>(R.id.radio_group_theme)
 
         // Load User Data
@@ -75,6 +76,13 @@ class UserProfileActivity : BaseActivity() {
              } else {
                  Toast.makeText(this, "No email found for user", Toast.LENGTH_SHORT).show()
              }
+        }
+
+        btnLogout.setOnClickListener {
+            authRepository.logout()
+            val intent = android.content.Intent(this, com.sbuddy.app.ui.login.LoginActivity::class.java)
+            intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
         }
 
         // Theme Selection
