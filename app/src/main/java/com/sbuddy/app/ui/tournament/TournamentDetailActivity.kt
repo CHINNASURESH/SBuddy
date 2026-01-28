@@ -11,12 +11,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.sbuddy.app.BaseActivity
 import com.sbuddy.app.R
+import com.sbuddy.app.data.repository.AuthRepository
 import com.sbuddy.app.data.repository.TournamentRepository
 import kotlinx.coroutines.launch
+import android.content.Intent
 
 class TournamentDetailActivity : BaseActivity() {
 
     private val repository = TournamentRepository()
+    private val authRepository = AuthRepository()
     private lateinit var adapter: FixtureAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +36,7 @@ class TournamentDetailActivity : BaseActivity() {
         val txtTitle = findViewById<TextView>(R.id.txt_toolbar_title)
         val imgHeader = findViewById<ImageView>(R.id.img_header)
         val recycler = findViewById<RecyclerView>(R.id.recycler_detail_fixtures)
+        val btnManage = findViewById<View>(R.id.btn_manage_tournament)
 
         recycler.layoutManager = LinearLayoutManager(this)
         // Read-only adapter
@@ -53,6 +57,17 @@ class TournamentDetailActivity : BaseActivity() {
                             imgHeader.setImageURI(Uri.parse(tournament.imageUrl))
                         } catch (e: Exception) {
                             imgHeader.visibility = View.GONE
+                        }
+                    }
+
+                    // Check ownership
+                    val currentUser = authRepository.getCurrentUser()
+                    if (currentUser != null && currentUser.uid == tournament.creatorId) {
+                        btnManage.visibility = View.VISIBLE
+                        btnManage.setOnClickListener {
+                            val intent = Intent(this@TournamentDetailActivity, TournamentActivity::class.java)
+                            intent.putExtra("TOURNAMENT_ID", tournament.id)
+                            startActivity(intent)
                         }
                     }
 

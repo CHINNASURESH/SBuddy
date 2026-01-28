@@ -39,6 +39,12 @@ class TournamentActivity : BaseActivity() {
     private var selectedImageUri: android.net.Uri? = null
     private var currentTournamentId: String = ""
 
+    // Loaded State
+    private var currentCreatorId: String = ""
+    private var currentCreatedDate: Long = 0
+    private var currentImageUrl: String = ""
+    private var currentStatus: String = "Open"
+
     private val rounds = mutableListOf<Match>()
     private lateinit var fixtureAdapter: FixtureAdapter
     private lateinit var scoreLauncher: ActivityResultLauncher<Intent>
@@ -84,6 +90,12 @@ class TournamentActivity : BaseActivity() {
         val checkPublic = findViewById<CheckBox>(R.id.check_public)
         val spinnerType = findViewById<Spinner>(R.id.spinner_tournament_type)
         val radioGroupMode = findViewById<android.widget.RadioGroup>(R.id.radio_group_mode)
+
+        // Load existing if ID passed
+        val intentId = intent.getStringExtra("TOURNAMENT_ID")
+        if (!intentId.isNullOrEmpty()) {
+            loadTournament(intentId)
+        }
 
         // Check Auth
         if (authRepository.getCurrentUser() == null) {
@@ -289,6 +301,55 @@ class TournamentActivity : BaseActivity() {
         }
     }
 
+    private fun loadTournament(id: String) {
+        lifecycleScope.launch {
+            val result = tournamentRepository.getTournament(id)
+            if (result.isSuccess) {
+                val tournament = result.getOrNull()
+                if (tournament != null) {
+                    currentTournamentId = tournament.id
+                    currentCreatorId = tournament.creatorId
+                    currentCreatedDate = tournament.date
+                    currentImageUrl = tournament.imageUrl
+                    currentStatus = tournament.status
+
+                    findViewById<EditText>(R.id.input_tournament_name).setText(tournament.name)
+                    findViewById<EditText>(R.id.input_tournament_location).setText(tournament.location)
+                    findViewById<EditText>(R.id.input_court_name).setText(tournament.courtName)
+                    findViewById<EditText>(R.id.input_organizer_mobile).setText(tournament.organizerMobile)
+                    findViewById<CheckBox>(R.id.check_public).isChecked = tournament.isPublic
+                    findViewById<EditText>(R.id.txt_bracket).setText(tournament.bracketText)
+
+                    participants.clear()
+                    participants.addAll(tournament.participants)
+                    findViewById<TextView>(R.id.txt_participants_count).text = "Participants: ${participants.size}"
+
+                    rounds.clear()
+                    rounds.addAll(tournament.rounds)
+                    fixtureAdapter.setMatches(rounds)
+
+                    if (tournament.imageUrl.isNotEmpty()) {
+                        selectedImageUri = android.net.Uri.parse(tournament.imageUrl)
+                        findViewById<android.widget.ImageView>(R.id.img_tournament_preview).visibility = View.VISIBLE
+                        findViewById<android.widget.ImageView>(R.id.img_tournament_preview).setImageURI(selectedImageUri)
+                    }
+
+                    val btnPublish = findViewById<Button>(R.id.btn_publish)
+                    btnPublish.text = "Save Changes"
+
+                    if (rounds.isNotEmpty()) {
+                        findViewById<RecyclerView>(R.id.recycler_fixtures).visibility = View.VISIBLE
+                        findViewById<View>(R.id.scroll_bracket_text).visibility = View.GONE
+                    }
+                } else {
+                    Toast.makeText(this@TournamentActivity, "Tournament not found", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(this@TournamentActivity, "Error loading tournament", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     private fun checkStoragePermission(): Boolean {
         // For Android 13+ (SDK 33), READ_MEDIA_IMAGES might be needed, but READ_EXTERNAL_STORAGE is deprecated.
         // For our purpose of SAF (ACTION_OPEN_DOCUMENT), permissions are granted by URI.
@@ -332,22 +393,20 @@ class TournamentActivity : BaseActivity() {
         val tCourt = inputCourtName.text.toString()
         val tMobile = inputOrganizerMobile.text.toString()
 
-        val status = if (rounds.isNotEmpty()) "In Progress" else "Open"
-
         val tournament = Tournament(
             id = currentTournamentId,
             name = tName,
-            creatorId = currentUserId,
-            date = System.currentTimeMillis(),
+            creatorId = if (currentCreatorId.isNotEmpty()) currentCreatorId else currentUserId,
+            date = if (currentCreatedDate > 0) currentCreatedDate else System.currentTimeMillis(),
             organizerMobile = tMobile,
             courtName = tCourt,
             participants = participants,
             bracketText = bracketText,
             rounds = rounds,
             isPublic = checkPublic.isChecked,
-            imageUrl = selectedImageUri?.toString() ?: "",
+            imageUrl = selectedImageUri?.toString() ?: currentImageUrl,
             location = tLocation,
-            status = status
+            status = if (rounds.isNotEmpty() && currentStatus == "Open") "In Progress" else currentStatus
         )
 
         lifecycleScope.launch {
@@ -361,10 +420,7 @@ class TournamentActivity : BaseActivity() {
                 currentTournamentId = result.getOrNull() ?: currentTournamentId
                 if (!silent) {
                     Toast.makeText(this@TournamentActivity, "Tournament Saved!", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this@TournamentActivity, TournamentDetailActivity::class.java)
-                    intent.putExtra("TOURNAMENT_ID", currentTournamentId)
-                    startActivity(intent)
-                    finish()
+                    btnPublish.text = "Save Changes"
                 }
             } else {
                 if (!silent) {
