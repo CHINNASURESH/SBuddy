@@ -5,6 +5,8 @@ data class Tournament(
     val name: String = "",
     val creatorId: String = "",
     val date: Long = 0,
+    val organizerMobile: String = "",
+    val courtName: String = "",
     val participants: List<String> = emptyList(),
     val rounds: List<Match> = emptyList(),
     val bracketText: String = "",

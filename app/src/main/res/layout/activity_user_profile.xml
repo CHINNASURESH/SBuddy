@@ -128,5 +128,15 @@
                 android:text="Yellow"/>
         </RadioGroup>
 
+        <Button
+            android:id="@+id/btn_logout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Logout"
+            android:backgroundTint="#FF5252"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="32dp"/>
+
     </LinearLayout>
 </ScrollView>

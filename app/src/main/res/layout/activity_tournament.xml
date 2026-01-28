@@ -158,6 +158,25 @@
                         android:padding="10dp"
                         android:layout_marginBottom="8dp"/>
 
+                    <EditText
+                        android:id="@+id/input_court_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Court Name (e.g. Central Park Courts)"
+                        android:background="#E0E0E0"
+                        android:padding="10dp"
+                        android:layout_marginBottom="8dp"/>
+
+                    <EditText
+                        android:id="@+id/input_organizer_mobile"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Organizer Mobile No"
+                        android:inputType="phone"
+                        android:background="#E0E0E0"
+                        android:padding="10dp"
+                        android:layout_marginBottom="8dp"/>
+
                     <CheckBox
                         android:id="@+id/check_public"
                         android:layout_width="wrap_content"
