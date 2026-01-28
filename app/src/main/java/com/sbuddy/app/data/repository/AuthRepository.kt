@@ -70,7 +70,11 @@ class AuthRepository {
             val firebaseUser = auth.currentUser
             if (firebaseUser != null) {
                 val user = User(uid = firebaseUser.uid, email = email)
-                db.collection("users").document(user.uid).set(user).await()
+                try {
+                    db.collection("users").document(user.uid).set(user).await()
+                } catch (e: Exception) {
+                    // Suppress Firestore write failure as the user is already created in Auth
+                }
                 Result.success(user)
             } else {
                 Result.failure(Exception("User creation failed"))
