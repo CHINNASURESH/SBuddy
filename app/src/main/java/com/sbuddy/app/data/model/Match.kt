@@ -1,5 +1,8 @@
 package com.sbuddy.app.data.model
 
+import androidx.annotation.Keep
+
+@Keep
 data class Match(
     val id: String = "",
     val player1Name: String = "",
