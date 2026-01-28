@@ -107,6 +107,9 @@ class TournamentAdapter(private val onItemClick: (Tournament) -> Unit) : Recycle
         private val nameView: TextView = itemView.findViewById(R.id.text_tournament_name)
         private val countView: TextView = itemView.findViewById(R.id.text_participants_count)
         private val locView: TextView = itemView.findViewById(R.id.text_tournament_location)
+        private val catView: TextView = itemView.findViewById(R.id.text_tournament_category)
+        private val courtView: TextView = itemView.findViewById(R.id.text_court_name)
+        private val mobileView: TextView = itemView.findViewById(R.id.text_organizer_mobile)
 
         fun bind(tournament: Tournament, onItemClick: (Tournament) -> Unit) {
             nameView.text = tournament.name
@@ -117,6 +120,27 @@ class TournamentAdapter(private val onItemClick: (Tournament) -> Unit) : Recycle
                 locView.text = "📍 ${tournament.location}"
             } else {
                 locView.visibility = View.GONE
+            }
+
+            if (tournament.category.isNotEmpty()) {
+                catView.visibility = View.VISIBLE
+                catView.text = "Category: ${tournament.category}"
+            } else {
+                catView.visibility = View.GONE
+            }
+
+            if (tournament.courtName.isNotEmpty()) {
+                courtView.visibility = View.VISIBLE
+                courtView.text = "Court: ${tournament.courtName}"
+            } else {
+                courtView.visibility = View.GONE
+            }
+
+            if (tournament.organizerMobile.isNotEmpty()) {
+                mobileView.visibility = View.VISIBLE
+                mobileView.text = "Mobile: ${tournament.organizerMobile}"
+            } else {
+                mobileView.visibility = View.GONE
             }
 
             itemView.setOnClickListener { onItemClick(tournament) }

@@ -31,6 +31,9 @@
         <activity
             android:name=".ui.tournament.TournamentActivity"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.tournament.TournamentFixturesActivity"
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ui.tournament.PublicTournamentsActivity" />
         <activity android:name=".ui.tournament.TournamentDetailActivity" />
         <activity android:name=".ui.group.BuddyGroupActivity" />
