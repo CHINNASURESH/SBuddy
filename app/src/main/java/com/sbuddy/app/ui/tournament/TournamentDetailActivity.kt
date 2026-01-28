@@ -38,6 +38,12 @@ class TournamentDetailActivity : BaseActivity() {
         val recycler = findViewById<RecyclerView>(R.id.recycler_detail_fixtures)
         val btnManage = findViewById<View>(R.id.btn_manage_tournament)
 
+        // Details views
+        val txtLoc = findViewById<TextView>(R.id.txt_detail_location)
+        val txtCat = findViewById<TextView>(R.id.txt_detail_category)
+        val txtCourt = findViewById<TextView>(R.id.txt_detail_court)
+        val txtMobile = findViewById<TextView>(R.id.txt_detail_mobile)
+
         recycler.layoutManager = LinearLayoutManager(this)
         // Read-only adapter
         adapter = FixtureAdapter(isReadOnly = true) {
@@ -51,6 +57,24 @@ class TournamentDetailActivity : BaseActivity() {
                 val tournament = result.getOrNull()
                 if (tournament != null) {
                     txtTitle.text = tournament.name
+
+                    if (tournament.location.isNotEmpty()) {
+                        txtLoc.visibility = View.VISIBLE
+                        txtLoc.text = "📍 ${tournament.location}"
+                    }
+                    if (tournament.category.isNotEmpty()) {
+                        txtCat.visibility = View.VISIBLE
+                        txtCat.text = "Category: ${tournament.category}"
+                    }
+                    if (tournament.courtName.isNotEmpty()) {
+                        txtCourt.visibility = View.VISIBLE
+                        txtCourt.text = "Court: ${tournament.courtName}"
+                    }
+                    if (tournament.organizerMobile.isNotEmpty()) {
+                        txtMobile.visibility = View.VISIBLE
+                        txtMobile.text = "Organizer Mobile: ${tournament.organizerMobile}"
+                    }
+
                     if (tournament.imageUrl.isNotEmpty()) {
                         try {
                             imgHeader.visibility = View.VISIBLE

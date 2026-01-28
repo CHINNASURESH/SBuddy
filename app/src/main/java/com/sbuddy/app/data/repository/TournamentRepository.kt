@@ -26,7 +26,7 @@ class TournamentRepository {
             return Result.success("mock-tournament-id-" + System.currentTimeMillis())
         }
         return try {
-            withTimeout(15000L) {
+            withTimeout(30000L) {
                 // If ID exists, update. If not, create new.
                 // Using set() with merge is safer for updates, but since we overwrite the whole object here:
                 val docRef = if (tournament.id.isEmpty()) {

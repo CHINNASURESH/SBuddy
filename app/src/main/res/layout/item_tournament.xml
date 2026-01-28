@@ -37,5 +37,32 @@
             android:layout_marginTop="4dp"
             android:visibility="gone"/>
 
+        <TextView
+            android:id="@+id/text_tournament_category"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Category: -"
+            android:textColor="#757575"
+            android:layout_marginTop="4dp"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/text_court_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Court: -"
+            android:textColor="#757575"
+            android:layout_marginTop="4dp"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/text_organizer_mobile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mobile: -"
+            android:textColor="#757575"
+            android:layout_marginTop="4dp"
+            android:visibility="gone"/>
+
     </LinearLayout>
 </androidx.cardview.widget.CardView>
